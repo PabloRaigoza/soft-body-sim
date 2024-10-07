@@ -1,6 +1,8 @@
 // need proper import and link to the compiler
+import { Particle } from './Particle';
+import { Spring } from './Spring';
 
-class SoftBody {
+export class SoftBody {
     particles: Particle[];
     springs: Spring[];
 

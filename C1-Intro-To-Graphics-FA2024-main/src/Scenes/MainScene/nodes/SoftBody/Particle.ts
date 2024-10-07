@@ -1,6 +1,5 @@
 // need proper import and link to the compiler
-
-class particle {
+export class Particle {
     position: { x: number; y: number };
     velocity: { x: number; y: number };
     mass: number;

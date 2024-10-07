@@ -5,11 +5,11 @@ import {MainComponent, GUIComponent} from "./Component";
 import {Layout, FullLayout, GUIBottomComponent, DefaultAppComponent} from "./Component";
 import {CreateAppState, ControlPanel} from "./anigraph";
 
-// import AppClasses from "./Scenes/MainScene"
+import AppClasses from "./Scenes/MainScene"
 // import AppClasses from "./Scenes/Catamari";
 // import AppClasses from "./Scenes/Example1"
 // import AppClasses from "./Scenes/Example2"
-import AppClasses from "./Scenes/Example3"
+// import AppClasses from "./Scenes/Example3"
 
 
 const AppComponentClass = AppClasses.ComponentClass??DefaultAppComponent;

@@ -1,5 +1,7 @@
 // need proper import and link to the compiler
-class Spring {
+import { Particle } from './Particle';
+
+export class Spring {
     particleA: Particle;
     particleB: Particle;
     restLength: number;
