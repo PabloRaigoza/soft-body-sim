@@ -30,7 +30,7 @@ export class MainSceneController extends App2DSceneController{
      */
     async initScene() {
         // You can set the clear color for the rendering context
-        this.setClearColor(Color.White());
+        this.setClearColor(Color.Black());
         this.initControlPanelControls();
         super.initScene();
 
@@ -42,33 +42,55 @@ export class MainSceneController extends App2DSceneController{
     initControlPanelControls(){
         const appState = GetAppState();
         const self = this;
-        appState.addSliderControl("ExampleSlider", 0, -1, 1, 0.001);
-        appState.addButton("Button", ()=>{
-            console.log("Button pressed!")
-            console.log(self)
-        })
+        // appState.addSliderControl("ExampleSlider", 0, -1, 1, 0.001);
+        // appState.addButton("Button", ()=>{
+        //     console.log("Button pressed!")
+        //     console.log(self)
+        // })
 
-        enum dropdown_options{
-            a=1,
-            b=2,
-            c=3
+        var normal_mesh_options = {
+            1: "triangle",
+            2: "cloth"
         }
-        let example_options = Object.values(dropdown_options);
+
+        let normal_options = Object.values(normal_mesh_options);
         appState.setGUIControlSpecKey(
-            "Dropdown",
+            "NormalMesh",
             {
-                options: example_options,
-                value: example_options[0],
+                options: normal_mesh_options,
+                value: normal_mesh_options[1],
                 onChange:(selected:any)=>{
                     switch (selected){
-                        case example_options[0]:
-                            console.log(example_options[0])
+                        case normal_mesh_options[1]:
+                            console.log(normal_mesh_options[1])
                             break;
-                        case example_options[1]:
-                            console.log(example_options[1])
+                        case normal_mesh_options[2]:
+                            console.log(normal_mesh_options[2])
                             break;
-                        case example_options[2]:
-                            console.log(example_options[2])
+                        default:
+                            console.warn(`unknown option "${selected}"!`);
+                            break;
+                    }
+                }
+            }
+        )
+        var pressure_mesh_options = {
+            1 : "triangle",
+            2 : "circle"
+        }
+        let pressure_options = Object.values(pressure_mesh_options);
+        appState.setGUIControlSpecKey(
+            "PressureMesh",
+            {
+                options: pressure_mesh_options,
+                value: pressure_mesh_options[1],
+                onChange:(selected:any)=>{
+                    switch (selected){
+                        case pressure_mesh_options[1]:
+                            console.log(pressure_mesh_options[1])
+                            break;
+                        case pressure_mesh_options[2]:
+                            console.log(pressure_mesh_options[2])
                             break;
                         default:
                             console.warn(`unknown option "${selected}"!`);
@@ -78,9 +100,9 @@ export class MainSceneController extends App2DSceneController{
             }
         )
         appState.setGUIControlSpecKey(
-            "Toggle",
+            "Pressure",
             {
-                value: true,
+                value: false,
                 onChange:(value:any)=>{
                     console.log(value);
                 }
