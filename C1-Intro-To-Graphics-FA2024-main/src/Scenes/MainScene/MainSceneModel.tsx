@@ -15,8 +15,8 @@ export class MainSceneModel extends App2DSceneModel{
      * @param appState
      */
     initAppState(appState:AppState){
-        appState.addSliderIfMissing("SliderValue1", 0, 0, 1, 0.001);
-        appState.addColorControl("ColorValue1", Color.FromString("#123abe"));
+        //appState.addSliderIfMissing("SliderValue1", 0, 0, 1, 0.001);
+        appState.addColorControl("ParticleColor", Color.FromString("#d20909"));
     }
 
     /**

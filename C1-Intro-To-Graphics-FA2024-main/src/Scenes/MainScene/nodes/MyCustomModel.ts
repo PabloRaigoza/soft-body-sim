@@ -16,6 +16,8 @@ import {
  */
 @ASerializable("MyCustomModel")
 export class MyCustomModel extends ANodeModel2D{
+
+
     /**
      * This is how you would signal a custom update event
      */
