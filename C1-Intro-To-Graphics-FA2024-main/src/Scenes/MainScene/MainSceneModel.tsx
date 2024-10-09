@@ -2,8 +2,8 @@ import {AppState, Color, DefaultMaterials, GetAppState, Polygon2D, V2, AParticle
 import {App2DSceneModel} from "../../anigraph/starter/App2D/App2DSceneModel";
 import {Polygon2DModel} from "../../anigraph/starter/nodes/polygon2D";
 import {AMaterial} from "../../anigraph";
-import { JointModel } from "./JointModel";
-
+import { JointModel } from "./nodes/Joint/JointModel";
+import { SpringModel } from "./nodes/Spring/SpringModel";
 
 let nErrors = 0;
 
@@ -36,6 +36,7 @@ export class MainSceneModel extends App2DSceneModel{
 
     joints:JointModel[] = []
     polygonMaterial!:AMaterial;
+    someSpring:SpringModel = new SpringModel();
     initScene(){
         let appState = GetAppState();
 
@@ -45,9 +46,16 @@ export class MainSceneModel extends App2DSceneModel{
         // Create a new joint model
         let aJoint = new JointModel();
         aJoint.setMaterial(this.polygonMaterial);
-        
         this.addChild(aJoint);
         this.joints.push(aJoint);
+
+        // Create a new spring model
+        this.someSpring = new SpringModel();
+        this.someSpring.setMaterial(this.polygonMaterial);
+        this.someSpring.addLine(new Vec2(0,0), new Vec2(0,1), Color.White(), Color.White());
+        this.someSpring.addLine(new Vec2(0,1), new Vec2(1,1), Color.White(), Color.White());
+        this.someSpring.addLine(new Vec2(1,1), new Vec2(1,0), Color.White(), Color.White());
+        this.addChild(this.someSpring);
     }
 
 

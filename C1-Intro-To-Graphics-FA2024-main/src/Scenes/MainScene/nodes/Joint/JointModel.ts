@@ -1,10 +1,10 @@
 import {
     ANodeModel2D, ANodeModel2DPRSA, ANodeModel3D, ANodeModel,
-} from "../../anigraph/scene";
-import type {TransformationInterface} from "../../anigraph/math";
-import {ASerializable} from "../../anigraph/base";
-import {BoundingBox2D, HasBounds2D, Polygon2D, VertexArray} from "../../anigraph/geometry";
-import {Color, Mat3, Transformation2DInterface, Vec2} from "../../anigraph/math";
+} from "../../../../anigraph/scene";
+import type {TransformationInterface} from "../../../../anigraph/math";
+import {ASerializable} from "../../../../anigraph/base";
+import {BoundingBox2D, HasBounds2D, Polygon2D, VertexArray} from "../../../../anigraph/geometry";
+import {Color, Mat3, Transformation2DInterface, Vec2} from "../../../../anigraph/math";
 
 let G = 1;
 @ASerializable("JointModel")
@@ -110,7 +110,7 @@ export class JointModel extends ANodeModel2D{
         if (this._position.y <= -5) {
             this._position.y = -5;  // Ensure position doesn't go below the ground
             this._velocity.y = Math.abs(this._velocity.y);  // Flip velocity in y-direction to simulate bounce
-            F.y += G * 0.4;
+            F.y += G / 2;
         } else {
         }
         
@@ -118,6 +118,5 @@ export class JointModel extends ANodeModel2D{
         this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
         this._position = this._position.plus(this._velocity.times(dt));  // Update position
         this.setPos(this._position);
-
     }
 }
