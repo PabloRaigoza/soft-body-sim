@@ -5,8 +5,8 @@
 // import styled, { css } from "styled-components";
 import styled from "styled-components";
 
-const WindowMaxWidthPercentage = 100;
-const WindowMaxHeightPercentage = 100;
+const WindowMaxWidthPercentage = 90;
+const WindowMaxHeightPercentage = 90;
 export const FullLayout = styled.div`
   display: flex;
   justify-content: center;
