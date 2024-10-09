@@ -13,6 +13,10 @@ import {Polygon2DModel, Polygon2DView} from "../../anigraph/starter/nodes/polygo
 import {MyCustomModel, MyCustomView, SplineModel, SplineView} from "./nodes";
 import {callLabCatForth} from "../Catamari/nodes";
 import {ASceneInteractionMode} from "../../anigraph/starter";
+import { JointModel } from "./nodes/Joint/JointModel";
+import { JointView } from "./nodes/Joint/JointModelView";
+import { SpringModel } from "./nodes/Spring/SpringModel";
+import { SpringView } from "./nodes/Spring/SpringView";
 
 /**
  * This is your Scene Controller class. The scene controller is responsible for managing user input with the keyboard
@@ -134,7 +138,8 @@ export class MainSceneController extends App2DSceneController{
         this.addModelViewSpec(MyCustomModel, MyCustomView);
         this.addModelViewSpec(LineSegmentsModel2D, LineSegmentsView2D);
         this.addModelViewSpec(SplineModel, SplineView);
-
+        this.addModelViewSpec(JointModel, JointView);
+        this.addModelViewSpec(SpringModel, SpringView);
     }
 
     /**

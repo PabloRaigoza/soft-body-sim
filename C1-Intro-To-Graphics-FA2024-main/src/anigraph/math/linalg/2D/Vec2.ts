@@ -58,4 +58,16 @@ export class Vec2 extends VectorBase {
     return [...this.elements, 0.0];
   }
 
+  // Add another vector to this one, modifying it in place
+  addInPlace(other: Vec2): Vec2 {
+      this.x += other.x;
+      this.y += other.y;
+      return this; // return the modified vector
+  }
+
+  // Add another vector and return a new Vec2
+  add(other: Vec2): Vec2 {
+      return new Vec2(this.x + other.x, this.y + other.y);
+  }
+
 }

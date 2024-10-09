@@ -3,7 +3,7 @@ import {App2DSceneModel} from "../../anigraph/starter/App2D/App2DSceneModel";
 import {Polygon2DModel} from "../../anigraph/starter/nodes/polygon2D";
 import {AMaterial} from "../../anigraph";
 import { SplineModel } from "./nodes";
-
+import { SpringModel } from "./nodes/Spring/SpringModel";
 
 let nErrors = 0;
 
@@ -56,29 +56,6 @@ export class MainSceneModel extends App2DSceneModel{
 
         // add a circle to the scene
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
-        // The inside should be transparent (alpha = 0)
-        // insideRectangle.verts.addVertex(V2(-100, -100), Color.FromString('#323232')); // Transparent inside
-        // insideRectangle.verts.addVertex(V2(-100, -80), Color.FromString('#323232'));  // Transparent inside
-        // insideRectangle.verts.addVertex(V2(100, -80), Color.FromString('#323232'));   // Transparent inside
-        // insideRectangle.verts.addVertex(V2(100, -100), Color.FromString('#323232'));  // Transparent inside
-        // add a square to the scene
-        // let square = new Polygon2DModel();
-        // square.setMaterial(this.polygonMaterial);
-        // square.verts.addVertex(V2(0,0), Color.FromRGBA(1,0,0,1));
-        // square.verts.addVertex(V2(1,0), Color.FromRGBA(0,1,0,1));
-        // square.verts.addVertex(V2(1,1), Color.FromRGBA(0,0,1,1));
-        // square.verts.addVertex(V2(0,1), Color.FromRGBA(1,1,0,1));
-        // this.addChild(square);
-
-        // add a triangle to the scene
-        // let triangle = new Polygon2DModel();
-        // triangle.setMaterial(this.polygonMaterial);
-        // triangle.verts.addVertex(V2(1,1), Color.FromRGBA(1,0,0,1));
-        // triangle.verts.addVertex(V2(3,2), Color.FromRGBA(0,1,0,1));
-        // triangle.verts.addVertex(V2(3,3), Color.FromRGBA(0,0,1,1));
-        // this.addChild(triangle);
-
-        //this.addChild(lineModel);
 
         // Create the rectangle using LineSegmentsModel2D
         this.rectangleModel.setMaterial(this.polygonMaterial); // Assuming there's a setMaterial method
@@ -116,6 +93,29 @@ export class MainSceneModel extends App2DSceneModel{
 
     addNewSpline(){
         this.addSpline(new SplineModel());
+                            
+    joints:JointModel[] = []
+    polygonMaterial!:AMaterial;
+    someSpring:SpringModel = new SpringModel();
+    initScene(){
+        let appState = GetAppState();
+
+        // add a circle to the scene
+        this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
+
+        // Create a new joint model
+        let aJoint = new JointModel();
+        aJoint.setMaterial(this.polygonMaterial);
+        this.addChild(aJoint);
+        this.joints.push(aJoint);
+
+        // Create a new spring model
+        this.someSpring = new SpringModel();
+        this.someSpring.setMaterial(this.polygonMaterial);
+        this.someSpring.addLine(new Vec2(0,0), new Vec2(0,1), Color.White(), Color.White());
+        this.someSpring.addLine(new Vec2(0,1), new Vec2(1,1), Color.White(), Color.White());
+        this.someSpring.addLine(new Vec2(1,1), new Vec2(1,0), Color.White(), Color.White());
+        this.addChild(this.someSpring);
     }
 
 
@@ -126,7 +126,12 @@ export class MainSceneModel extends App2DSceneModel{
             for (let spline of this.splines){
                 spline.timeUpdate(t);
             }
+            // Update all models
+            for (let joint of this.joints) {
+                joint.timeUpdate(t);
+            }
         }
+
         catch(e) {
             if(nErrors<1){
                 console.error(e);

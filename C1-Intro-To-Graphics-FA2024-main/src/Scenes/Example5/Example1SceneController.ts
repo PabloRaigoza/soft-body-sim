@@ -1,39 +1,20 @@
 import {App2DSceneController} from "../../anigraph/starter/App2D/App2DSceneController";
-import {Example2SceneModel} from "./Example2SceneModel";
+import {Example1SceneModel} from "./Example1SceneModel";
+import {ADragInteraction, AGLContext, AInteractionEvent, AKeyboardInteraction, Color} from "../../anigraph";
+import {Polygon2DModelPRSA} from "../../anigraph/starter/nodes/polygon2D/Polygon2DModelPRSA";
 import {Polygon2DModel, Polygon2DView} from "../../anigraph/starter/nodes/polygon2D";
-import {ExampleParticleSystemModel, ExampleParticleSystemView} from "./nodes";
-import {LabCatFloationgHeadModel} from "./nodes/LabCatFloatingHead/LabCatFloationgHeadModel";
-import {
-    A2DMeshView,
-    ADragInteraction, AGLContext,
-    AInteractionEvent,
-    AKeyboardInteraction,
-    ANodeModel,
-    ANodeView, ASVGView, Mat3, NodeTransform2D, NodeTransform3D, Vec2, Color
-} from "../../anigraph";
-import {CustomSVGModel} from "./nodes/CustomSVGModel";
+import {LabCatFloationgHeadModel} from "../Example2/nodes/LabCatFloatingHead/LabCatFloationgHeadModel";
+import {CustomPolygon2DMat3Model, CustomPolygon2DPRSAModel} from "./CustomPolygon2DModel";
 
-export class Example2SceneController extends App2DSceneController{
-    get model():Example2SceneModel{
-        return this._model as Example2SceneModel;
+export class Example1SceneController extends App2DSceneController{
+    get model():Example1SceneModel{
+        return this._model as Example1SceneModel;
     }
 
-
     async initScene() {
-        super.initScene();
-
         // You can set the clear color for the rendering context
-        // this.setClearColor(new Color(1.0,1.0, 1.0));
-        // this.setClearColor(new Color(0.0,0.0, 0.0));
-
-        // We can also set a background texture.
-        // It is important to use "await" when loading a texture here if you plan to use it right away. This is because
-        // loading happens asynchronously, so if you don't add "await" you may try to reference the texture before it
-        // has finished loading, which is cause an error.
-        await this.model.loadTexture(`./images/SpaceBG.jpg`, "Space");// Load the texture with the scene model
-        this.view.setBackgroundTexture(this.model.getTexture("Space"));// Set the texture as your background
-
-
+        this.setClearColor(new Color(1.0,1.0, 1.0));
+        super.initScene();
     }
 
     /**
@@ -41,25 +22,9 @@ export class Example2SceneController extends App2DSceneController{
      */
     initModelViewSpecs() {
         this.addModelViewSpec(Polygon2DModel, Polygon2DView);
-        this.addModelViewSpec(ExampleParticleSystemModel, ExampleParticleSystemView);
-        this.addModelViewSpec(LabCatFloationgHeadModel, A2DMeshView);
-        this.addModelViewSpec(CustomSVGModel, ASVGView);
-    }
-
-    /**
-     * This will create any view specified by an addModelViewSpec call by default.
-     * Only use this function if you want to do something custom / unusual that can't be contelled with a spec.
-     * @param {ANodeModel} nodeModel
-     * @returns {ANodeView}
-     */
-    createViewForNodeModel(nodeModel: ANodeModel): ANodeView {
-        if(false){
-            console.log("This is where you might do something very custom")
-        }else{
-            // The super function will just create a view based on what you specified in `initModelViewSpecs`
-            return super.createViewForNodeModel(nodeModel);
-        }
-
+        this.addModelViewSpec(Polygon2DModelPRSA, Polygon2DView);
+        this.addModelViewSpec(CustomPolygon2DMat3Model, Polygon2DView)
+        this.addModelViewSpec(CustomPolygon2DPRSAModel, Polygon2DView)
     }
 
     initInteractions() {
@@ -111,9 +76,7 @@ export class Example2SceneController extends App2DSceneController{
                     interaction.cursorStartPosition = this.getWorldCoordinatesOfCursorEvent(event);
                 },
                 onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                    let cursorPosition = this.getWorldCoordinatesOfCursorEvent(event) as Vec2;
-                    let cursorStartPosition = interaction.cursorStartPosition;
-                    let cursorVector = cursorPosition.minus(cursorStartPosition);
+                    let cursorPosition = event.ndcCursor?.times(this.model.sceneScale);
                     let keysDownState = self.getKeysDownState();
                     if(cursorPosition) {
                         if(event.shiftKey){
@@ -124,13 +87,10 @@ export class Example2SceneController extends App2DSceneController{
                         }
                     }
                 },
-                onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                },
+                onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{},
                 onClick:(event:AInteractionEvent)=>{
                     this.eventTarget.focus();
-                    let cursorPosition = this.getWorldCoordinatesOfCursorEvent(event) as Vec2;
-                    this.model.labCatVectorHead.setTransform(Mat3.Translation2D(cursorPosition));
-
+                    let cursorPosition = event.ndcCursor?.times(this.model.sceneScale);
                     let keysDownState = self.getKeysDownState();
                     if(cursorPosition) {
                         if (keysDownState['x']) {
