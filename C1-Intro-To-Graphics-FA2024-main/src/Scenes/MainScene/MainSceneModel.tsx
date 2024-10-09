@@ -1,13 +1,8 @@
-<<<<<<< Updated upstream
-import {AppState, Color, GetAppState} from "../../anigraph";
-import {App2DSceneModel} from "../../anigraph/starter/App2D/App2DSceneModel";
-=======
 import {AppState, Color, DefaultMaterials, GetAppState, Polygon2D, V2, AParticle2D, Vec2, Mat3, LineSegmentsModel2D, LineSegmentsView2D} from "../../anigraph";
 import {App2DSceneModel} from "../../anigraph/starter/App2D/App2DSceneModel";
 import {Polygon2DModel} from "../../anigraph/starter/nodes/polygon2D";
 import {AMaterial} from "../../anigraph";
 import { SplineModel } from "./nodes";
->>>>>>> Stashed changes
 
 
 let nErrors = 0;
@@ -47,9 +42,6 @@ export class MainSceneModel extends App2DSceneModel{
      * You may also want to add tags to your models, which provide an additional way to control how they are rendered
      * by the scene controller. See example code below.
      */
-<<<<<<< Updated upstream
-    initScene(){
-=======
 
     polygons:Polygon2DModel[] = []
     polygonMaterial!:AMaterial;
@@ -115,7 +107,6 @@ export class MainSceneModel extends App2DSceneModel{
             this.circle.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
         // circle.setVerts(pnts);
         this.addChild(this.circle);
->>>>>>> Stashed changes
     }
 
     addSpline(spline:SplineModel){
@@ -130,23 +121,8 @@ export class MainSceneModel extends App2DSceneModel{
 
 
     timeUpdate(t: number) {
-        try {
-<<<<<<< Updated upstream
-=======
-            // // Generate small random deltas for the position
-            // let deltaX = (Math.random() - 0.5) * 0.4; // Move randomly in x
-            // let deltaY = (Math.random() - 0.5) * 0.4; // Move randomly in y
-
-            // // Update circle position
-            // this.circlePosition.addInPlace(V2(deltaX, deltaY));
-
-            // // Apply the translation to the circle
-            // this.circle.setTransform(
-            //     Mat3.Translation2D(this.circlePosition)
-            // );
-
->>>>>>> Stashed changes
-        }catch(e) {
+        try {}
+        catch(e) {
             if(nErrors<1){
                 console.error(e);
                 nErrors+=1;
