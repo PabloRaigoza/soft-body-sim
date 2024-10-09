@@ -121,7 +121,12 @@ export class MainSceneModel extends App2DSceneModel{
 
 
     timeUpdate(t: number) {
-        try {}
+        try {
+            let t = this.clock.time;
+            for (let spline of this.splines){
+                spline.timeUpdate(t);
+            }
+        }
         catch(e) {
             if(nErrors<1){
                 console.error(e);

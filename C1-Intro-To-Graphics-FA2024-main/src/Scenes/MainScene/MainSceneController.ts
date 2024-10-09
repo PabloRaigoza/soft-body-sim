@@ -2,6 +2,7 @@ import {App2DSceneController} from "../../anigraph/starter/App2D/App2DSceneContr
 import {MainSceneModel} from "./MainSceneModel";
 import {
     ADragInteraction,
+    ASerializable,
     AGLContext,
     AInteractionEvent,
     AKeyboardInteraction, ANodeModel, ANodeView,
@@ -17,9 +18,16 @@ import {ASceneInteractionMode} from "../../anigraph/starter";
  * This is your Scene Controller class. The scene controller is responsible for managing user input with the keyboard
  * and mouse, as well as making sure that the view hierarchy matches the model heirarchy.
  */
+@ASerializable("MainSceneController")
 export class MainSceneController extends App2DSceneController{
+    mainInteractionMode!: ASceneInteractionMode;
+
     get model():MainSceneModel{
         return this._model as MainSceneModel;
+    }
+
+    get splineModel(){
+        return this.model.currentSpline;
     }
 
 
@@ -28,12 +36,11 @@ export class MainSceneController extends App2DSceneController{
      * Check out Lab Cat's helpful Example2 scene for example code that sets the background to an image.
      * @returns {Promise<void>}
      */
-    async initScene() {
+    async initScene(): Promise<void> {
         // You can set the clear color for the rendering context
-        super.initScene();
+        await super.initScene();
         this.setClearColor(Color.FromString('#323232'));
         this.initControlPanelControls();
-
         // Subscribe to stuff if desired...
         // const self = this;
         // this.subscribe()
@@ -148,91 +155,90 @@ export class MainSceneController extends App2DSceneController{
          * Here we will create an interaction mode, which defines one set of controls
          * At any point, there is an active interaction mode.
          */
-        this.createNewInteractionMode(
-            "Main",
+        this.mainInteractionMode = new ASceneInteractionMode(
+            "A1InteractionMode",
+            this,
             {
-                onKeyDown: (event:AInteractionEvent, interaction:AKeyboardInteraction)=>{
-                    console.log(event.key)
-                    /**
-                     * Respond to key down events
-                     */
-
-                    /**
-                     * This is how you handle arrow keys
-                     */
-                    if (event.key === "ArrowRight") {
-                    }
-                    if (event.key === "ArrowLeft") {
-                    }
-                    if (event.key === "ArrowUp") {
-                    }
-                    if (event.key === "ArrowDown") {
-                    }
-                    if(event.key == "C"){
-                    }
-                },
-
+                onKeyDown: (event:AInteractionEvent, interaction:AKeyboardInteraction)=>{},
                 onKeyUp:(event:AInteractionEvent, interaction:AKeyboardInteraction)=>{
-                    /**
-                     * Respond to key up events
-                     */
-                    if (event.key === "ArrowRight") {
+                    if(event.key==='t'){
+                        this.model.addNewSpline()
                     }
-                    if (event.key === "ArrowLeft") {
+
+                    if(event.key==='L'){
+                        this.model.currentSpline.interpolationMode=SplineModel.InterpolationModes.Linear;
                     }
-                    if (event.key === "ArrowUp") {
+                    if(event.key==='C'){
+                        this.model.currentSpline.interpolationMode=SplineModel.InterpolationModes.CubicBezier;
                     }
-                    if (event.key === "ArrowDown") {
+
+
+                    if(event.key==='s'){
+                    }
+                    if(event.key==='S'){
+                    }
+                    if(event.key==='ArrowRight'){
+                    }
+                    if(event.key==='ArrowLeft'){
+                    }
+                    if(event.key==='ArrowUp'){
+                    }
+                    if(event.key==='ArrowDown'){
                     }
                 },
                 onDragStart:(event:AInteractionEvent, interaction:ADragInteraction)=>{
                     let ndcCursor = event.ndcCursor;
                     if(ndcCursor) {
-                        interaction.cursorStartPosition = this.model.worldPointFromNDCCursor(ndcCursor);
+                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                        interaction.cursorStartPosition = cursorPosition;
+                        if(self.splineModel.nControlPoints<1){
+                            self.splineModel.verts.addVertices(
+                                [
+                                    cursorPosition,
+                                    cursorPosition,
+                                ],
+                                Color.White()
+                            )
+                        }else {
+                            self.splineModel.verts.addVertices(
+                                [
+                                    cursorPosition,
+                                    cursorPosition,
+                                    cursorPosition,
+                                ],
+                                Color.White()
+                            )
+                        }
+                        // this.newVertsColor = Color.RandomRGB();
+                        this.splineModel.signalGeometryUpdate();
                     }
                 },
                 onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                    let cursorPosition = event.ndcCursor?.times(this.model.sceneScale);
-                    let keysDownState = self.getKeysDownState();
-                    if(cursorPosition) {
-                        if(event.shiftKey){
+                    let ndcCursor = event.ndcCursor;
+                    if(ndcCursor) {
+                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                        let startPosition = interaction.cursorStartPosition;
+                        if (this.splineModel.nControlPoints > 3) {
+                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 2, startPosition);
+                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
+                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 3, startPosition.minus(cursorPosition.minus(startPosition)));
+                        }else{
+                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
                         }
-                        if (keysDownState['x']) {
-                        } else if (keysDownState['y']) {
-                        } else {
-                        }
+                        this.splineModel.signalGeometryUpdate();
                     }
                 },
                 onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{},
-                onClick:(event:AInteractionEvent)=>{
-                    this.eventTarget.focus();
-                    let cursorPosition = event.ndcCursor?.times(this.model.sceneScale);
-                    let keysDownState = self.getKeysDownState();
-                    if(cursorPosition) {
-                        if (keysDownState['x']) {
-                            console.log(`Click with "x" key at ${cursorPosition.elements[0], cursorPosition.elements[1]}`)
-                        } else {
-                            console.log(`Click at ${cursorPosition.elements[0], cursorPosition.elements[1]}`)
-                        }
-                        if(event.shiftKey){
-                            console.log(`Click with shift key at ${cursorPosition.elements[0], cursorPosition.elements[1]}`)
-                        }
-                    }
-                    this.model.signalComponentUpdate();
-                },
+                // onClick:(event:AInteractionEvent)=>{},
+                // afterActivate:(...args:any[])=>{},
+                // afterDeactivate:(...args:any[])=>{},
+                // beforeActivate:(...args:any[])=>{},
+                // beforeDeactivate:(...args:any[])=>{},
+                //dispose:()=>{},
             }
         )
-        this.setCurrentInteractionMode("Main");
+        this.defineInteractionMode("MainInteractionMode", this.mainInteractionMode);
+        this.setCurrentInteractionMode("MainInteractionMode");
     }
-
-    onAnimationFrameCallback(context:AGLContext) {
-        // call the model's time update function
-        this.model.timeUpdate(this.model.clock.time)
-
-        // render the scene view
-        super.onAnimationFrameCallback(context);
-    }
-
-
 
 }
