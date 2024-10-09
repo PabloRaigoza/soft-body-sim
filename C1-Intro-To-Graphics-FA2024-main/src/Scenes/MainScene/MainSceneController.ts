@@ -161,7 +161,7 @@ export class MainSceneController extends App2DSceneController{
          * At any point, there is an active interaction mode.
          */
         this.mainInteractionMode = new ASceneInteractionMode(
-            "A1InteractionMode",
+            "MainInteractionMode",
             this,
             {
                 onKeyDown: (event:AInteractionEvent, interaction:AKeyboardInteraction)=>{},
@@ -169,14 +169,6 @@ export class MainSceneController extends App2DSceneController{
                     if(event.key==='t'){
                         this.model.addNewSpline()
                     }
-
-                    if(event.key==='L'){
-                        this.model.currentSpline.interpolationMode=SplineModel.InterpolationModes.Linear;
-                    }
-                    if(event.key==='C'){
-                        this.model.currentSpline.interpolationMode=SplineModel.InterpolationModes.CubicBezier;
-                    }
-
 
                     if(event.key==='s'){
                     }
@@ -218,21 +210,21 @@ export class MainSceneController extends App2DSceneController{
                         this.splineModel.signalGeometryUpdate();
                     }
                 },
-                onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                    let ndcCursor = event.ndcCursor;
-                    if(ndcCursor) {
-                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                        let startPosition = interaction.cursorStartPosition;
-                        if (this.splineModel.nControlPoints > 3) {
-                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 2, startPosition);
-                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
-                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 3, startPosition.minus(cursorPosition.minus(startPosition)));
-                        }else{
-                            this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
-                        }
-                        this.splineModel.signalGeometryUpdate();
-                    }
-                },
+                // onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
+                //     let ndcCursor = event.ndcCursor;
+                //     if(ndcCursor) {
+                //         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                //         let startPosition = interaction.cursorStartPosition;
+                //         if (this.splineModel.nControlPoints > 3) {
+                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 2, startPosition);
+                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
+                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 3, startPosition.minus(cursorPosition.minus(startPosition)));
+                //         }else{
+                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
+                //         }
+                //         this.splineModel.signalGeometryUpdate();
+                //     }
+                // },
                 onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{},
                 // onClick:(event:AInteractionEvent)=>{},
                 // afterActivate:(...args:any[])=>{},

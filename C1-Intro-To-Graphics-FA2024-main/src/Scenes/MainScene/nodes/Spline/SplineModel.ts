@@ -43,7 +43,7 @@ export class SplineModel extends Curve2DModel{
      * Width/thickness of the control shape when it is visible
      * @type {number}
      */
-    controlShapeWidth:number=0.003;
+    controlShapeWidth:number=0.005;
     /**
      * Whether the control shape is visible.
      * @type {boolean}

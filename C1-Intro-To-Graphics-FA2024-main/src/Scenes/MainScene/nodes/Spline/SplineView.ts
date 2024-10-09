@@ -22,20 +22,14 @@ export class SplineView extends ANodeView{
     }
 
     init(): void {
-        this.stroke = new ALineGraphic();
-        this.stroke.init(this.getSplineVerts(this.nSamplesPerSegment), this.model.getStrokeMaterial());
-        this.stroke.setLineWidth(this.model.lineWidth);
         this.controlShape = new ALineGraphic();
         this.controlShape.init(this.model.verts.clone().FillColor(Color.FromString("#00aa00")), this.model.getFrameMaterial());
         this.controlShape.setLineWidth(this.model.controlShapeWidth);
-        this.registerAndAddGraphic(this.stroke);
         this.registerAndAddGraphic(this.controlShape);
     }
 
     update(): void {
         this.controlShape.setVerts2D(this.model.verts.clone().FillColor(Color.FromString("#00aa00")));
-        this.stroke.setVerts2D(this.getSplineVerts(this.nSamplesPerSegment));
-        this.stroke.setLineWidth(this.model.lineWidth);
         this.controlShape.setLineWidth(this.model.controlShapeWidth);
         this.setTransform(new NodeTransform3D(V3(0.0, 0.0, -0.1)))
         this.controlShape.visible=this.model.controlShapeVisible;
