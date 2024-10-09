@@ -9,7 +9,7 @@ import {
     AInteractionEvent,
     AKeyboardInteraction,
     ANodeModel,
-    ANodeView, ASVGView, Mat3, NodeTransform2D, NodeTransform3D, Vec2
+    ANodeView, ASVGView, Mat3, NodeTransform2D, NodeTransform3D, Vec2, Color
 } from "../../anigraph";
 import {CustomSVGModel} from "./nodes/CustomSVGModel";
 
