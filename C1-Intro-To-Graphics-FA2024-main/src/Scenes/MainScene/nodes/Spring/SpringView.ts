@@ -7,9 +7,14 @@
 import {ANodeView} from "../../../../anigraph/scene";
 import {ALineSegmentsGraphic} from "../../../../anigraph/rendering";
 import {SpringModel} from "./SpringModel";
+import { ALineGraphic } from "../../../../anigraph/rendering"; 
+import { Color } from "../../../../anigraph/math";
+import { NodeTransform3D } from "../../../../anigraph/math";
+import { V3 } from "../../../../anigraph/math";
 
-export class SpringView extends ANodeView{
-    lineSegments!:ALineSegmentsGraphic;
+export class SpringView extends ANodeView {
+    controlShape!:ALineGraphic;
+
     get model():SpringModel{
         return this._model as SpringModel;
     }
@@ -20,14 +25,17 @@ export class SpringView extends ANodeView{
     }
 
     init(){
-        // this.lines = new ALineSegmentsGraphic(VertexArray3D.CreateForRendering(false, false, true))
-        this.lineSegments = ALineSegmentsGraphic.Create(this.model.verts, this.model.material.threejs, this.model.lineWidth)
-        // this.lines.setLineWidth(0.01);
-        this.registerAndAddGraphic(this.lineSegments);
+        this.controlShape = new ALineGraphic();
+        this.controlShape.init(this.model.verts.clone().FillColor(Color.FromString("#00aa00")), this.model.getFrameMaterial());
+        this.controlShape.setLineWidth(this.model.lineWidth);
+        this.controlShape.visible = true;
+        this.registerAndAddGraphic(this.controlShape);
     }
 
     update(): void {
-        this.lineSegments.setVerts(this.model.verts);
-        this.lineSegments.setLineWidth(this.model.lineWidth);
+        this.controlShape.visible = true;
+        this.controlShape.setVerts2D(this.model.verts.clone().FillColor(Color.FromString("#00aa00")));
+        this.controlShape.setLineWidth(this.model.lineWidth);
+        this.setTransform(new NodeTransform3D(V3(0.0, 0.0, -0.1)));
     }
 }

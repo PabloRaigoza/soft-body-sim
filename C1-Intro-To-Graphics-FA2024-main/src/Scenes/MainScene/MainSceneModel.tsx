@@ -67,12 +67,27 @@ export class MainSceneModel extends App2DSceneModel{
         this.joints.push(aJoint);
 
         // Create a new spring model
-        this.someSpring = new SpringModel();
-        this.someSpring.setMaterial(this.polygonMaterial);
-        this.someSpring.addLine(new Vec2(0,0), new Vec2(0,1), Color.White(), Color.White());
-        this.someSpring.addLine(new Vec2(0,1), new Vec2(1,1), Color.White(), Color.White());
-        this.someSpring.addLine(new Vec2(1,1), new Vec2(1,0), Color.White(), Color.White());
-        this.addChild(this.someSpring);
+        // this.someSpring = new SpringModel();
+        // this.someSpring.setMaterial(this.polygonMaterial);
+        // this.someSpring.addLine(new Vec2(0,0), new Vec2(0,1), Color.White(), Color.FromRGBA(1,0,0,1));
+        // this.someSpring.addLine(new Vec2(0,1), new Vec2(1,1), Color.White(), Color.FromRGBA(1,0,0,1));
+        // this.someSpring.addLine(new Vec2(1,1), new Vec2(1,0), Color.White(), Color.FromRGBA(1,0,0,1));
+        
+        let spring = new SpringModel();
+        spring.setMaterial(this.polygonMaterial);
+        spring.verts.addVertex(V2(0,0), Color.White());
+        spring.verts.addVertex(V2(0,1), Color.White());
+        spring.verts.addVertex(V2(1,1), Color.White());
+        spring.verts.addVertex(V2(1,0), Color.White());
+        this.addChild(spring);
+
+        // let spline = new SplineModel();
+        // spline.setMaterial(this.polygonMaterial);
+        // spline.verts.addVertex(V2(0,0), Color.White());
+        // spline.verts.addVertex(V2(0,1), Color.White());
+        // spline.verts.addVertex(V2(1,1), Color.White());
+        // spline.verts.addVertex(V2(1,0), Color.White());
+        // this.addChild(spline);
     }
 
 
