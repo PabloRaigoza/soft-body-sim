@@ -30,9 +30,9 @@ export class MainSceneController extends App2DSceneController{
      */
     async initScene() {
         // You can set the clear color for the rendering context
+        super.initScene();
         this.setClearColor(Color.FromString('#323232'));
         this.initControlPanelControls();
-        super.initScene();
 
         // Subscribe to stuff if desired...
         // const self = this;
