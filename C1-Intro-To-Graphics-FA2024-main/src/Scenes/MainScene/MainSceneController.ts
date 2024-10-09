@@ -6,10 +6,10 @@ import {
     AInteractionEvent,
     AKeyboardInteraction, ANodeModel, ANodeView,
     Color,
-    GetAppState
+    GetAppState, LineSegmentsModel2D, LineSegmentsView2D, V2
 } from "../../anigraph";
 import {Polygon2DModel, Polygon2DView} from "../../anigraph/starter/nodes/polygon2D";
-import {MyCustomModel, MyCustomView} from "./nodes";
+import {MyCustomModel, MyCustomView, SplineModel, SplineView} from "./nodes";
 import {callLabCatForth} from "../Catamari/nodes";
 import {ASceneInteractionMode} from "../../anigraph/starter";
 
@@ -30,7 +30,7 @@ export class MainSceneController extends App2DSceneController{
      */
     async initScene() {
         // You can set the clear color for the rendering context
-        this.setClearColor(Color.Black());
+        this.setClearColor(Color.FromString('#323232'));
         this.initControlPanelControls();
         super.initScene();
 
@@ -125,6 +125,8 @@ export class MainSceneController extends App2DSceneController{
         // create and add a corresponding Polygon2DView and connect it to the new model
         this.addModelViewSpec(Polygon2DModel, Polygon2DView);
         this.addModelViewSpec(MyCustomModel, MyCustomView);
+        this.addModelViewSpec(LineSegmentsModel2D, LineSegmentsView2D);
+        this.addModelViewSpec(SplineModel, SplineView);
 
     }
 

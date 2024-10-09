@@ -3,6 +3,7 @@ import {ASerializable} from "../../../../base";
 import {Color, Vec2, Vec3, Vec4} from "../../../../math";
 import {ANodeModel2D} from "../../../nodeModel";
 import {VertexAttributeColor3DArray} from "../../../../geometry";
+import {DefaultMaterials} from "../../../../../anigraph";
 
 @ASerializable("LineSegmentsModel2D")
 export class LineSegmentsModel2D extends ANodeModel2D{
@@ -10,7 +11,7 @@ export class LineSegmentsModel2D extends ANodeModel2D{
     constructor(){
         super();
         this.verts.color = new VertexAttributeColor3DArray()
-        this.lineWidth = 0.01;
+        this.lineWidth = 0.1;
     }
 
     addLine(start:Vec2, end:Vec2, startColor:Color, endColor:Color){
