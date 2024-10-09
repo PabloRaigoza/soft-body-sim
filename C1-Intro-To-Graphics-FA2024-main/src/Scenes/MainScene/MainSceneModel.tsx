@@ -2,6 +2,7 @@ import {AppState, Color, DefaultMaterials, GetAppState, Polygon2D, V2, AParticle
 import {App2DSceneModel} from "../../anigraph/starter/App2D/App2DSceneModel";
 import {Polygon2DModel} from "../../anigraph/starter/nodes/polygon2D";
 import {AMaterial} from "../../anigraph";
+import { JointModel } from "./JointModel";
 
 
 let nErrors = 0;
@@ -33,61 +34,30 @@ export class MainSceneModel extends App2DSceneModel{
      * by the scene controller. See example code below.
      */
 
-    polygons:Polygon2DModel[] = []
+    joints:JointModel[] = []
     polygonMaterial!:AMaterial;
-    circle = new Polygon2DModel();
-    circlePosition: Vec2 = V2(0, 0); // Start at (0,0)
-    // particleSystem!:ExampleParticleSystemModel;
     initScene(){
         let appState = GetAppState();
 
         // add a circle to the scene
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
 
-        // add a square to the scene
-        let square = new Polygon2DModel();
-        square.setMaterial(this.polygonMaterial);
-        square.verts.addVertex(V2(0,0), Color.FromRGBA(1,0,0,1));
-        square.verts.addVertex(V2(1,0), Color.FromRGBA(0,1,0,1));
-        square.verts.addVertex(V2(1,1), Color.FromRGBA(0,0,1,1));
-        square.verts.addVertex(V2(0,1), Color.FromRGBA(1,1,0,1));
-        this.addChild(square);
-
-        // add a triangle to the scene
-        // let triangle = new Polygon2DModel();
-        // triangle.setMaterial(this.polygonMaterial);
-        // triangle.verts.addVertex(V2(1,1), Color.FromRGBA(1,0,0,1));
-        // triangle.verts.addVertex(V2(3,2), Color.FromRGBA(0,1,0,1));
-        // triangle.verts.addVertex(V2(3,3), Color.FromRGBA(0,0,1,1));
-        // this.addChild(triangle);
-
-        // // add a circle to the scene
-        // let circle = new Polygon2DModel();
-        this.circle.setMaterial(this.polygonMaterial);
-        let pnts = Polygon2D.CircleVArray(0.5, 1000);
-        // circle.verts.addVertices(pnts[0], pnts[1]);
-        for (let i = 0; i < pnts.nVerts; i++)
-            this.circle.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
-        // circle.setVerts(pnts);
-        this.addChild(this.circle);
+        // Create a new joint model
+        let aJoint = new JointModel();
+        aJoint.setMaterial(this.polygonMaterial);
+        
+        this.addChild(aJoint);
+        this.joints.push(aJoint);
     }
 
 
 
     timeUpdate(t: number) {
         try {
-            // Generate small random deltas for the position
-            let deltaX = (Math.random() - 0.5) * 0.4; // Move randomly in x
-            let deltaY = (Math.random() - 0.5) * 0.4; // Move randomly in y
-
-            // Update circle position
-            this.circlePosition.addInPlace(V2(deltaX, deltaY));
-
-            // Apply the translation to the circle
-            this.circle.setTransform(
-                Mat3.Translation2D(this.circlePosition)
-            );
-
+            // Update all models
+            for (let joint of this.joints) {
+                joint.timeUpdate(t);
+            }
         }catch(e) {
             if(nErrors<1){
                 console.error(e);

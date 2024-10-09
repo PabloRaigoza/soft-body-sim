@@ -10,6 +10,7 @@ import AppClasses from "./Scenes/MainScene"
 // import AppClasses from "./Scenes/Example1"
 // import AppClasses from "./Scenes/Example2"
 // import AppClasses from "./Scenes/Example3"
+// import AppClasses from "./Scenes/Example5"
 
 
 const AppComponentClass = AppClasses.ComponentClass??DefaultAppComponent;
