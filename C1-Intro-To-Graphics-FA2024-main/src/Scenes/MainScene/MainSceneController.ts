@@ -140,9 +140,9 @@ export class MainSceneController extends App2DSceneController{
         this.addModelViewSpec(MyCustomModel, MyCustomView);
         this.addModelViewSpec(LineSegmentsModel2D, LineSegmentsView2D);
         this.addModelViewSpec(SplineModel, SplineView);
-        this.addModelViewSpec(JointModel, JointView);
         this.addModelViewSpec(SpringModel, SpringView);
         this.addModelViewSpec(GeometryModel, GeometryView);
+        this.addModelViewSpec(JointModel, JointView);
     }
 
     /**

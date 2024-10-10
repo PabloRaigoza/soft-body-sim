@@ -1,4 +1,3 @@
-
 import {ASerializable} from "../../../../anigraph/base";
 import {ANodeView2D} from "../../../../anigraph/scene";
 import {APolygon2DGraphic} from "../../../../anigraph/rendering";
