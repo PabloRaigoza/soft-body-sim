@@ -22,7 +22,7 @@ import { MainSceneModel } from "Scenes/MainScene/MainSceneModel";
 export class SpringModel extends ANodeModel2D {
     lineWidth: number = 0.003;
     damping: number = 0.00;
-    stiffness: number = 0.05;
+    stiffness: number = 0.3;
     edges: Vec3[] = [];
     _polys: VertexArray2D[] = [];
 
@@ -114,11 +114,8 @@ export class SpringModel extends ANodeModel2D {
         //     this.joints[i2]._force = F_d1.times(-F);
         // }
 
-
-
-
-
-        for (let joint of this.joints) joint.timeUpdate(t);
+        
+        for (let joint of this.joints) joint.timeUpdate(t, this.joints);
         // for (let i = 0; i < this.joints.length; i++) {
         //     let j = this.joints[i].position;
         //     let toAdd = new Vec2(j.x - this.verts.vertexAt(i).x, j.y - this.verts.vertexAt(i).y);

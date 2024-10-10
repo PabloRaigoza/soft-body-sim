@@ -182,9 +182,31 @@ export class JointModel extends ANodeModel2D{
         return false;
     }
 
+    jointsCollision(joints: JointModel[]){
+        for (let joint of joints){
+            if (joint == this) continue;
+            let distance = this._position.minus(joint._position).dot(this._position.minus(joint._position));
+            let r = 0.5;
+            if (distance < r){
+                let og_pos = this._position.clone();
+                let new_pos = joint._position.clone();
+                let normal = new_pos.minus(og_pos);
+                normal.normalize();
+                
+                this.setPos(new_pos.plus(normal.times(2 * r)));
+                let v = this._velocity.clone();
+                let u = normal.times(v.dot(normal) / normal.dot(normal));
+                let w = v.minus(u);
+                this._velocity = w.minus(u);
+            }
+        }
+    }
+
 
     timeUpdate(t: number, ...args: any[]): void {
-        const G = 0.02;
+        let joints = args[0];
+
+        const G = 0.005;
         let F = this._force;
         let dt = t - this._lt;  // Delta time for the current frame
         dt = 1;
@@ -192,16 +214,23 @@ export class JointModel extends ANodeModel2D{
 
         // if(this.environmentCollision()) F.y = 0;
         this.environmentCollision();
+        this.jointsCollision(joints);
 
         // Check for collision with the ground
         // if (this._position.y <= -5) {
         //     this._position.y = -5;  // Ensure position doesn't go below the ground
-        //     this._velocity.y = Math.abs(this._velocity.y);  // Flip velocity in y-direction to simulate bounce
+            // this._velocity.y = Math.abs(this._velocity.y);  // Flip velocity in y-direction to simulate bounce
         //     // F.y += G;
         // }
         
         // Update position on screen or environment
         this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
+        // set max velocity
+        let maxVel = 0.05;
+        if (this._velocity.dot(this._velocity) > maxVel * maxVel) {
+            this._velocity.normalize();
+            this._velocity = this._velocity.times(maxVel);
+        }
         this._position = this._position.plus(this._velocity.times(dt));  // Update position
         this.setPos(this._position);
 
