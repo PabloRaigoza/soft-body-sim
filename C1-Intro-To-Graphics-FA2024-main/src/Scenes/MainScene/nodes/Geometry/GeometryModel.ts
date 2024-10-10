@@ -16,11 +16,14 @@ export class GeometryModel extends Polygon2DModel{
     constructor() {
         super();
         this.verts.initColorAttribute()
-        this.verts.addVertex(new Vec2(8,-5));
-        this.verts.addVertex(new Vec2(8,-6));
-        this.verts.addVertex(new Vec2(-8,-6));
-        this.verts.addVertex(new Vec2(-8,-5));
-        this.verts.addVertex(new Vec2(8,-5));
+        // this.verts.addVertex(new Vec2(8,-5+2));
+        // this.verts.addVertex(new Vec2(8,-6+2));
+        // this.verts.addVertex(new Vec2(-8,-6-2));
+        // this.verts.addVertex(new Vec2(-8,-5-2));
+        this.verts.addVertex(new Vec2(-8,-7));
+        this.verts.addVertex(new Vec2(8, -3));
+        this.verts.addVertex(new Vec2(8, -4));
+        this.verts.addVertex(new Vec2(-8, -8));
         //this.addTransformListener()
     }
 
