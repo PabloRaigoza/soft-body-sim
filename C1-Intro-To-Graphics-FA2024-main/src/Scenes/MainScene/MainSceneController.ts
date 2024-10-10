@@ -17,6 +17,8 @@ import { JointModel } from "./nodes/Joint/JointModel";
 import { JointView } from "./nodes/Joint/JointModelView";
 import { SpringModel } from "./nodes/Spring/SpringModel";
 import { SpringView } from "./nodes/Spring/SpringView";
+import { GeometryModel } from "./nodes/Geometry/GeometryModel";
+import { GeometryView } from "./nodes/Geometry/GeometryView";
 
 /**
  * This is your Scene Controller class. The scene controller is responsible for managing user input with the keyboard
@@ -140,6 +142,7 @@ export class MainSceneController extends App2DSceneController{
         this.addModelViewSpec(SplineModel, SplineView);
         this.addModelViewSpec(JointModel, JointView);
         this.addModelViewSpec(SpringModel, SpringView);
+        this.addModelViewSpec(GeometryModel, GeometryView);
     }
 
     /**
