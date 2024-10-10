@@ -14,20 +14,16 @@ export class JointModel extends ANodeModel2D{
     _velocity: Vec2 = new Vec2(0, 0);
     _mass: number = 1;
     _lt: number = 0;
+    _force: Vec2 = new Vec2(0, 0);
 
     set zValue(value) {
         this._zValue = value;
         this.signalGeometryUpdate();
     }
 
-    get verts(): Polygon2D{
-        return this._geometry.verts as Polygon2D;
-    }
-
-    get zValue() {
-        return this._zValue;
-    }
-
+    get verts(): Polygon2D { return this._geometry.verts as Polygon2D; }
+    get zValue() { return this._zValue; }
+    get position() { return this._position; }
 
     /**
      * Adds the provided JointModel as a child, and sets the child's parent to be this.
@@ -45,11 +41,11 @@ export class JointModel extends ANodeModel2D{
             verts??Polygon2D.CreateForRendering(true, true, false)
         )
 
-        let pnts = Polygon2D.CircleVArray(1, 15);
+        let pnts = Polygon2D.CircleVArray(0.25, 15);
         for (let i = 0; i < pnts.nVerts; i++)
             this.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
 
-        this.setPos(new Vec2(0, 4));
+        // this.setPos(new Vec2(0, 4));
     }
 
     getTransform3D() {
@@ -98,25 +94,31 @@ export class JointModel extends ANodeModel2D{
         return thisGeometry.getIntersectionsWithPolygon(otherGeometry);
     }
 
+    applyForce(force: Vec2){
+        this._force.addInPlace(force);
+    }
+
 
     timeUpdate(t: number, ...args: any[]): void {
         const G = 0.01;
-        let F = new Vec2(0, 0);
+        let F = this._force;
         let dt = t - this._lt;  // Delta time for the current frame
         dt = 1;
-        F.y += -G;  // Add gravity force
+        F.y += -G;
 
         // Check for collision with the ground
         if (this._position.y <= -5) {
             this._position.y = -5;  // Ensure position doesn't go below the ground
             this._velocity.y = Math.abs(this._velocity.y);  // Flip velocity in y-direction to simulate bounce
-            F.y += G / 2;
-        } else {
+            // F.y += G;
         }
         
         // Update position on screen or environment
         this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
         this._position = this._position.plus(this._velocity.times(dt));  // Update position
         this.setPos(this._position);
+
+        this._force = new Vec2(0, 0);
+        this._velocity = this._velocity.times(0.95);  // Apply damping
     }
 }

@@ -53,54 +53,84 @@ export class MainSceneModel extends App2DSceneModel{
     }
                             
     joints:JointModel[] = [];
+    springs:SpringModel[] = [];
     polygonMaterial!:AMaterial;
-    someSpring:SpringModel = new SpringModel();
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
-
-        // Create a new joint model
-        let aJoint = new JointModel();
-        aJoint.setMaterial(this.polygonMaterial);
-        this.addChild(aJoint);
-        this.joints.push(aJoint);
-
-        // Create a new spring model
-        // this.someSpring = new SpringModel();
-        // this.someSpring.setMaterial(this.polygonMaterial);
-        // this.someSpring.addLine(new Vec2(0,0), new Vec2(0,1), Color.White(), Color.FromRGBA(1,0,0,1));
-        // this.someSpring.addLine(new Vec2(0,1), new Vec2(1,1), Color.White(), Color.FromRGBA(1,0,0,1));
-        // this.someSpring.addLine(new Vec2(1,1), new Vec2(1,0), Color.White(), Color.FromRGBA(1,0,0,1));
         
+        // Mesh options
+        this.basicTrussMesh();
+    }
+
+    basicTrussMesh() {
         let spring = new SpringModel();
         spring.setMaterial(this.polygonMaterial);
-        spring.verts.addVertex(V2(0,0), Color.White());
-        spring.verts.addVertex(V2(0,1), Color.White());
-        spring.verts.addVertex(V2(1,1), Color.White());
-        spring.verts.addVertex(V2(1,0), Color.White());
-        this.addChild(spring);
 
-        // let spline = new SplineModel();
-        // spline.setMaterial(this.polygonMaterial);
-        // spline.verts.addVertex(V2(0,0), Color.White());
-        // spline.verts.addVertex(V2(0,1), Color.White());
-        // spline.verts.addVertex(V2(1,1), Color.White());
-        // spline.verts.addVertex(V2(1,0), Color.White());
-        // this.addChild(spline);
+        let p0 = new Vec2(-2,0);
+        let p1 = new Vec2(0,0);
+        let p2 = new Vec2(2,0);
+        let p3 = new Vec2(-1,2);
+        let p4 = new Vec2(1,2);
+        let p5 = new Vec2(-1,-2);
+        let p6 = new Vec2(1,-2);
+        let p7 = new Vec2(-4,0);
+        let p8 = new Vec2(4,0);
+
+        // Shift all points up 1
+        let tr = new Vec2(0,10);
+        p0 = p0.add(tr);
+        p1 = p1.add(tr);
+        p2 = p2.add(tr);
+        p3 = p3.add(tr);
+        p4 = p4.add(tr);
+        p5 = p5.add(tr);
+        p6 = p6.add(tr);
+        p7 = p7.add(tr);
+        p8 = p8.add(tr);
+
+        spring.addJoint(p0, this.polygonMaterial, this);
+        spring.addJoint(p1, this.polygonMaterial, this);
+        spring.addJoint(p2, this.polygonMaterial, this);
+        spring.addJoint(p3, this.polygonMaterial, this);
+        spring.addJoint(p4, this.polygonMaterial, this);
+        spring.addJoint(p5, this.polygonMaterial, this);
+        spring.addJoint(p6, this.polygonMaterial, this);
+        spring.addJoint(p7, this.polygonMaterial, this);
+        spring.addJoint(p8, this.polygonMaterial, this);
+
+        // Top half
+        spring.addEdge(0,1,Math.sqrt(p0.add(p1.times(-1)).dot(p0.add(p1.times(-1)))));
+        spring.addEdge(1,2,Math.sqrt(p1.add(p2.times(-1)).dot(p1.add(p2.times(-1)))));
+        spring.addEdge(3,4,Math.sqrt(p3.add(p4.times(-1)).dot(p3.add(p4.times(-1)))));
+        spring.addEdge(0,3,Math.sqrt(p0.add(p3.times(-1)).dot(p0.add(p3.times(-1)))));
+        spring.addEdge(1,4,Math.sqrt(p1.add(p4.times(-1)).dot(p1.add(p4.times(-1)))));
+        spring.addEdge(2,4,Math.sqrt(p2.add(p4.times(-1)).dot(p2.add(p4.times(-1)))));
+        spring.addEdge(1,3,Math.sqrt(p1.add(p3.times(-1)).dot(p1.add(p3.times(-1)))));
+
+        // Bottom half
+        spring.addEdge(0,5,Math.sqrt(p0.add(p5.times(-1)).dot(p0.add(p5.times(-1)))));
+        spring.addEdge(1,5,Math.sqrt(p1.add(p5.times(-1)).dot(p1.add(p5.times(-1)))));
+        spring.addEdge(1,6,Math.sqrt(p1.add(p6.times(-1)).dot(p1.add(p6.times(-1)))));
+        spring.addEdge(2,6,Math.sqrt(p2.add(p6.times(-1)).dot(p2.add(p6.times(-1)))));
+        spring.addEdge(5,6,Math.sqrt(p5.add(p6.times(-1)).dot(p5.add(p6.times(-1)))));
+
+        // Diagonal
+        spring.addEdge(0,7,Math.sqrt(p0.add(p7.times(-1)).dot(p0.add(p7.times(-1)))));
+        spring.addEdge(2,8,Math.sqrt(p2.add(p8.times(-1)).dot(p2.add(p8.times(-1)))));
+
+        this.addChild(spring);
+        this.springs.push(spring);
     }
 
 
 
     timeUpdate(t: number) {
         try {
-            for (let spline of this.splines){
-                spline.timeUpdate(t);
-            }
-            // Update all models
-            for (let joint of this.joints) {
-                joint.timeUpdate(t);
-            }
+            for (let spline of this.splines) spline.timeUpdate(t);
+            // for (let joint of this.joints) joint.timeUpdate(t);
+            for (let spring of this.springs) spring.timeUpdate(t);
         }
 
         catch(e) {
