@@ -14,20 +14,16 @@ export class JointModel extends ANodeModel2D{
     _velocity: Vec2 = new Vec2(0, 0);
     _mass: number = 1;
     _lt: number = 0;
+    _force: Vec2 = new Vec2(0, 0);
 
     set zValue(value) {
         this._zValue = value;
         this.signalGeometryUpdate();
     }
 
-    get verts(): Polygon2D{
-        return this._geometry.verts as Polygon2D;
-    }
-
-    get zValue() {
-        return this._zValue;
-    }
-
+    get verts(): Polygon2D { return this._geometry.verts as Polygon2D; }
+    get zValue() { return this._zValue; }
+    get position() { return this._position; }
 
     /**
      * Adds the provided JointModel as a child, and sets the child's parent to be this.
@@ -98,10 +94,14 @@ export class JointModel extends ANodeModel2D{
         return thisGeometry.getIntersectionsWithPolygon(otherGeometry);
     }
 
+    applyForce(force: Vec2){
+        this._force.addInPlace(force);
+    }
+
 
     timeUpdate(t: number, ...args: any[]): void {
-        const G = 0.01;
-        let F = new Vec2(0, 0);
+        const G = 0.02;
+        let F = this._force;
         let dt = t - this._lt;  // Delta time for the current frame
         dt = 1;
         F.y += -G;  // Add gravity force
@@ -110,13 +110,15 @@ export class JointModel extends ANodeModel2D{
         if (this._position.y <= -5) {
             this._position.y = -5;  // Ensure position doesn't go below the ground
             this._velocity.y = Math.abs(this._velocity.y);  // Flip velocity in y-direction to simulate bounce
-            F.y += G / 2;
-        } else {
+            // F.y += G;
         }
         
         // Update position on screen or environment
         this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
         this._position = this._position.plus(this._velocity.times(dt));  // Update position
         this.setPos(this._position);
+
+        this._force = new Vec2(0, 0);
+        this._velocity = this._velocity.times(0.95);  // Apply damping
     }
 }

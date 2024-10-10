@@ -53,8 +53,8 @@ export class MainSceneModel extends App2DSceneModel{
     }
                             
     joints:JointModel[] = [];
+    springs:SpringModel[] = [];
     polygonMaterial!:AMaterial;
-    someSpring:SpringModel = new SpringModel();
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
@@ -63,44 +63,39 @@ export class MainSceneModel extends App2DSceneModel{
         // Create a new joint model
         let aJoint = new JointModel();
         aJoint.setMaterial(this.polygonMaterial);
-        this.addChild(aJoint);
-        this.joints.push(aJoint);
+        aJoint.setPos(V2(-2,0));
+        // this.addChild(aJoint);
+        // this.joints.push(aJoint);
 
-        // Create a new spring model
-        // this.someSpring = new SpringModel();
-        // this.someSpring.setMaterial(this.polygonMaterial);
-        // this.someSpring.addLine(new Vec2(0,0), new Vec2(0,1), Color.White(), Color.FromRGBA(1,0,0,1));
-        // this.someSpring.addLine(new Vec2(0,1), new Vec2(1,1), Color.White(), Color.FromRGBA(1,0,0,1));
-        // this.someSpring.addLine(new Vec2(1,1), new Vec2(1,0), Color.White(), Color.FromRGBA(1,0,0,1));
-        
+        // Create another joint
+        let anotherJoint = new JointModel();
+        anotherJoint.setMaterial(this.polygonMaterial);
+        anotherJoint.setPos(V2(2,0));
+
         let spring = new SpringModel();
         spring.setMaterial(this.polygonMaterial);
-        spring.verts.addVertex(V2(0,0), Color.White());
-        spring.verts.addVertex(V2(0,1), Color.White());
-        spring.verts.addVertex(V2(1,1), Color.White());
-        spring.verts.addVertex(V2(1,0), Color.White());
-        this.addChild(spring);
+        spring.verts.addVertex(aJoint.position, Color.White());
+        spring.verts.addVertex(anotherJoint.position, Color.White());
 
-        // let spline = new SplineModel();
-        // spline.setMaterial(this.polygonMaterial);
-        // spline.verts.addVertex(V2(0,0), Color.White());
-        // spline.verts.addVertex(V2(0,1), Color.White());
-        // spline.verts.addVertex(V2(1,1), Color.White());
-        // spline.verts.addVertex(V2(1,0), Color.White());
-        // this.addChild(spline);
+        spring.joints.push(aJoint);
+        spring.joints.push(anotherJoint);
+        this.addChild(aJoint);
+        this.addChild(anotherJoint);
+        
+        this.addChild(spring);
+        
+        this.springs.push(spring);
+        this.joints.push(aJoint);
+        this.joints.push(anotherJoint);
     }
 
 
 
     timeUpdate(t: number) {
         try {
-            for (let spline of this.splines){
-                spline.timeUpdate(t);
-            }
-            // Update all models
-            for (let joint of this.joints) {
-                joint.timeUpdate(t);
-            }
+            for (let spline of this.splines) spline.timeUpdate(t);
+            // for (let joint of this.joints) joint.timeUpdate(t);
+            for (let spring of this.springs) spring.timeUpdate(t);
         }
 
         catch(e) {
