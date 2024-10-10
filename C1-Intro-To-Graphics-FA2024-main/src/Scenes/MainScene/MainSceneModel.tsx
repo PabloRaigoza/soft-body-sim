@@ -6,6 +6,7 @@ import { SpringModel } from "./nodes/Spring/SpringModel";
 import { JointModel } from "./nodes/Joint/JointModel";
 import { GeometryModel } from "./nodes/Geometry/GeometryModel";
 import { NodeTransform2D } from "../../anigraph/math";
+import { Polygon2DModel } from "anigraph/starter/nodes/polygon2D";
 
 let nErrors = 0;
 
@@ -62,9 +63,7 @@ export class MainSceneModel extends App2DSceneModel{
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
         
-        // Obstracle 1
-        this.Obstracle1();
-        // Mesh options
+        this.obstacles();
         this.basicTrussMesh();
     }
 
@@ -79,8 +78,8 @@ export class MainSceneModel extends App2DSceneModel{
         let p4 = new Vec2(1,2);
         let p5 = new Vec2(-1,-2);
         let p6 = new Vec2(1,-2);
-        let p7 = new Vec2(-4,0);
-        let p8 = new Vec2(4,0);
+        // let p7 = new Vec2(-4,0);
+        // let p8 = new Vec2(4,0);
 
         // Shift all points up 1
         let tr = new Vec2(0,10);
@@ -91,8 +90,8 @@ export class MainSceneModel extends App2DSceneModel{
         p4 = p4.add(tr);
         p5 = p5.add(tr);
         p6 = p6.add(tr);
-        p7 = p7.add(tr);
-        p8 = p8.add(tr);
+        // p7 = p7.add(tr);
+        // p8 = p8.add(tr);
 
         spring.addJoint(p0, this.polygonMaterial, this);
         spring.addJoint(p1, this.polygonMaterial, this);
@@ -101,8 +100,8 @@ export class MainSceneModel extends App2DSceneModel{
         spring.addJoint(p4, this.polygonMaterial, this);
         spring.addJoint(p5, this.polygonMaterial, this);
         spring.addJoint(p6, this.polygonMaterial, this);
-        spring.addJoint(p7, this.polygonMaterial, this);
-        spring.addJoint(p8, this.polygonMaterial, this);
+        // spring.addJoint(p7, this.polygonMaterial, this);
+        // spring.addJoint(p8, this.polygonMaterial, this);
 
         // Top half
         spring.addEdge(0,1,Math.sqrt(p0.add(p1.times(-1)).dot(p0.add(p1.times(-1)))));
@@ -114,69 +113,40 @@ export class MainSceneModel extends App2DSceneModel{
         spring.addEdge(1,3,Math.sqrt(p1.add(p3.times(-1)).dot(p1.add(p3.times(-1)))));
 
         // Bottom half
-        spring.addEdge(0,5,Math.sqrt(p0.add(p5.times(-1)).dot(p0.add(p5.times(-1)))));
-        spring.addEdge(1,5,Math.sqrt(p1.add(p5.times(-1)).dot(p1.add(p5.times(-1)))));
-        spring.addEdge(1,6,Math.sqrt(p1.add(p6.times(-1)).dot(p1.add(p6.times(-1)))));
-        spring.addEdge(2,6,Math.sqrt(p2.add(p6.times(-1)).dot(p2.add(p6.times(-1)))));
-        spring.addEdge(5,6,Math.sqrt(p5.add(p6.times(-1)).dot(p5.add(p6.times(-1)))));
+        // spring.addEdge(0,5,Math.sqrt(p0.add(p5.times(-1)).dot(p0.add(p5.times(-1)))));
+        // spring.addEdge(1,5,Math.sqrt(p1.add(p5.times(-1)).dot(p1.add(p5.times(-1)))));
+        // spring.addEdge(1,6,Math.sqrt(p1.add(p6.times(-1)).dot(p1.add(p6.times(-1)))));
+        // spring.addEdge(2,6,Math.sqrt(p2.add(p6.times(-1)).dot(p2.add(p6.times(-1)))));
+        // spring.addEdge(5,6,Math.sqrt(p5.add(p6.times(-1)).dot(p5.add(p6.times(-1)))));
 
         // Diagonal
-        spring.addEdge(0,7,Math.sqrt(p0.add(p7.times(-1)).dot(p0.add(p7.times(-1)))));
-        spring.addEdge(2,8,Math.sqrt(p2.add(p8.times(-1)).dot(p2.add(p8.times(-1)))));
+        // spring.addEdge(0,7,Math.sqrt(p0.add(p7.times(-1)).dot(p0.add(p7.times(-1)))));
+        // spring.addEdge(2,8,Math.sqrt(p2.add(p8.times(-1)).dot(p2.add(p8.times(-1)))));
 
+        spring.setPolys([this.myRect2.verts, this.myRect.verts]);
+        
         this.addChild(spring);
         this.springs.push(spring);
     }
 
-    myRect:GeometryModel = new GeometryModel();
-    Obstracle1() {
-        // Create a new rectangle model
-        const transform = new NodeTransform2D(
-            new Vec2(10, 20),   // position (translation)
-            Math.PI / 4,        // rotation (45 degrees in radians)
-            new Vec2(2, 2),     // scale (uniform scaling of 2)
-            new Vec2(5, 5)      // anchor point (optional, default is Vec2(0,0))
-        );
-
-        this.myRect = new GeometryModel();
-        // rectangle1.setMaterial(this.polygonMaterial);
-        // rectangle1.verts.addVertex(new Vec2(8,-5));
-        // rectangle1.verts.addVertex(new Vec2(8,-6));
-        // rectangle1.verts.addVertex(new Vec2(-8,-6));
-        // rectangle1.verts.addVertex(new Vec2(-8,-5));
-        // rectangle1.verts.addVertex(new Vec2(8,-5));
-        // rectangle1.setTransform(transform);
+    myRect:Polygon2DModel = new Polygon2DModel();
+    myRect2:Polygon2DModel = new Polygon2DModel();
+    obstacles() {
+        this.myRect = new Polygon2DModel();
+        this.myRect.setMaterial(this.polygonMaterial);
+        this.myRect.verts.addVertex(new Vec2(-8, -5 + 1), Color.White());
+        this.myRect.verts.addVertex(new Vec2(8.5, -5), Color.White());
+        this.myRect.verts.addVertex(new Vec2(8.5, -4), Color.White());
+        this.myRect.verts.addVertex(new Vec2(-8, -4 + 1), Color.White());
         this.addChild(this.myRect);
 
-        // // Create a new triangle model
-        // //let triangle1 = new TrianglesModel();
-        // let triangle = new GeometryModel();
-        // triangle.setMaterial(this.polygonMaterial);
-        // triangle.verts.addVertex(V2(-6, -5));
-        // triangle.verts.addVertex(V2(0, -5));
-        // triangle.verts.addVertex(V2(-3, 1));
-        // triangle.verts.addVertex(V2(-6, -5));
-        // this.addChild(triangle);
-
-        // // Create a new rectangle model
-        // let rectangle2 = new GeometryModel();
-        // rectangle2.setMaterial(this.polygonMaterial);
-        // rectangle2.verts.addVertex(new Vec2(1,-2));
-        // rectangle2.verts.addVertex(new Vec2(5,5));
-        // rectangle2.verts.addVertex(new Vec2(6,4));
-        // rectangle2.verts.addVertex(new Vec2(2,-3));
-        // rectangle2.verts.addVertex(new Vec2(1,-2));
-        // this.addChild(rectangle2);
-
-        // // Create a new rectangle model
-        // let rectangle3 = new GeometryModel();
-        // rectangle3.setMaterial(this.polygonMaterial);
-        // rectangle3.verts.addVertex(new Vec2(-1,3));
-        // rectangle3.verts.addVertex(new Vec2(0,4));
-        // rectangle3.verts.addVertex(new Vec2(-6,7));
-        // rectangle3.verts.addVertex(new Vec2(-7,6));
-        // rectangle3.verts.addVertex(new Vec2(-1,3));
-        // this.addChild(rectangle3);
+        this.myRect2 = new Polygon2DModel();
+        this.myRect2.setMaterial(this.polygonMaterial);
+        this.myRect2.verts.addVertex(new Vec2(8, 5), Color.White());
+        this.myRect2.verts.addVertex(new Vec2(9, 5), Color.White());
+        this.myRect2.verts.addVertex(new Vec2(9, -7), Color.White());
+        this.myRect2.verts.addVertex(new Vec2(8, -7), Color.White());
+        this.addChild(this.myRect2);
     }
 
 
@@ -184,9 +154,7 @@ export class MainSceneModel extends App2DSceneModel{
     timeUpdate(t: number) {
         try {
             for (let spline of this.splines) spline.timeUpdate(t);
-            // for (let joint of this.joints) joint.timeUpdate(t);
             for (let spring of this.springs) spring.timeUpdate(t);
-            this.myRect.setTransform(Mat3.Rotation(t));
         }
 
         catch(e) {

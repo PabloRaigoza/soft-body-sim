@@ -26,7 +26,7 @@ export class GeometryView extends ANodeView {
 
     init(){
         this.controlShape = new ALineGraphic();
-        this.controlShape.init(this.model.verts.clone().FillColor(Color.FromString("#ffffff")), this.model.getFrameMaterial());
+        this.controlShape.init(this.model.verts.clone().FillColor(Color.FromString("#aaaaaa")), this.model.getFrameMaterial());
         this.controlShape.setLineWidth(this.model.lineWidth);
         this.controlShape.visible = true;
         this.registerAndAddGraphic(this.controlShape);
@@ -34,8 +34,7 @@ export class GeometryView extends ANodeView {
 
     update(): void {
         this.controlShape.visible = true;
-        this.controlShape.setVerts2D(this.model.verts.clone().FillColor(Color.FromString("#ffffff")));
-        // this.setTransform(this.model.transform);
+        this.controlShape.setVerts2D(this.model.verts.clone().FillColor(Color.FromString("#aaaaaa")));
         this.controlShape.setLineWidth(this.model.lineWidth);
         this.setTransform(new NodeTransform3D(V3(0.0, 0.0, -0.1)));
     }
