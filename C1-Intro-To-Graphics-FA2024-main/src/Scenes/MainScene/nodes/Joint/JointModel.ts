@@ -41,11 +41,11 @@ export class JointModel extends ANodeModel2D{
             verts??Polygon2D.CreateForRendering(true, true, false)
         )
 
-        let pnts = Polygon2D.CircleVArray(1, 15);
+        let pnts = Polygon2D.CircleVArray(0.25, 15);
         for (let i = 0; i < pnts.nVerts; i++)
             this.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
 
-        this.setPos(new Vec2(0, 4));
+        // this.setPos(new Vec2(0, 4));
     }
 
     getTransform3D() {
@@ -100,11 +100,11 @@ export class JointModel extends ANodeModel2D{
 
 
     timeUpdate(t: number, ...args: any[]): void {
-        const G = 0.02;
+        const G = 0.01;
         let F = this._force;
         let dt = t - this._lt;  // Delta time for the current frame
         dt = 1;
-        F.y += -G;  // Add gravity force
+        F.y += -G;
 
         // Check for collision with the ground
         if (this._position.y <= -5) {
