@@ -22,7 +22,7 @@ import { MainSceneModel } from "Scenes/MainScene/MainSceneModel";
 export class SpringModel extends ANodeModel2D {
     lineWidth: number = 0.003;
     damping: number = 0.01;
-    stiffness: number = 0.05;
+    stiffness: number = 0.5;
     edges: Vec3[] = [];
 
     @AObjectState change : boolean = false;
