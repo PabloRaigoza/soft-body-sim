@@ -34,9 +34,6 @@ export class GeometryView extends Polygon2DView {
 
     init(){
         this.controlShape = new ALineGraphic();
-        this.newVerts = this.model.verts.clone().FillColor(Color.FromString("#aaaaaa"));
-        this.newVerts.addVertex(this.model.verts.vertexAt(0), Color.FromString("#aaaaaa"));
-        this.controlShape.init(this.newVerts.FillColor(Color.FromString("#aaaaaa")), this.model.getFrameMaterial());
         this.controlShape.setLineWidth(this.model.lineWidth);
         this.controlShape.visible = true;
         this.registerAndAddGraphic(this.controlShape);
@@ -48,10 +45,6 @@ export class GeometryView extends Polygon2DView {
 
     update(): void {
         this.controlShape.visible = true;
-        this.newVerts = this.model.verts.clone().FillColor(Color.FromString("#aaaaaa"));
-        this.newVerts.addVertex(this.model.verts.vertexAt(0), Color.FromString("#aaaaaa"));
-        this.controlShape.setVerts2D(this.newVerts.FillColor(Color.FromString("#aaaaaa")));
-        // this.setTransform(this.model.transform);
         this.controlShape.setLineWidth(this.model.lineWidth);
         this.setTransform(new NodeTransform3D(V3(0.0, 0.0, -0.1)));
     }

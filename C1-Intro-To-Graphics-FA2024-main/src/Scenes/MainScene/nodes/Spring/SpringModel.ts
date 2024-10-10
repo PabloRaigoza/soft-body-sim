@@ -21,9 +21,10 @@ import { MainSceneModel } from "Scenes/MainScene/MainSceneModel";
 @ASerializable("SpringModel")
 export class SpringModel extends ANodeModel2D {
     lineWidth: number = 0.003;
-    damping: number = 0.01;
-    stiffness: number = 0.5;
+    damping: number = 0.00;
+    stiffness: number = 0.05;
     edges: Vec3[] = [];
+    _polys: VertexArray2D[] = [];
 
     @AObjectState change : boolean = false;
     joints: JointModel[] = [];
@@ -51,6 +52,11 @@ export class SpringModel extends ANodeModel2D {
         this.edges.push(new Vec3(i, j, l));
         // this.verts.addVertex(this.joints[i].position, Color.White());
         // this.verts.addVertex(this.joints[j].position, Color.White());
+    }
+
+    setPolys(polys: VertexArray2D[]) {
+        this._polys = polys;
+        for (let joint of this.joints) joint.setPolys(polys);
     }
 
     timeUpdate(t: number, ...args: any[]): void {
