@@ -70,15 +70,15 @@ export class MainSceneModel extends App2DSceneModel{
     }
                             
     springs:SpringModel[] = [];
+    sceneShapes: Polygon2DModel[] = [];
     polygonMaterial!:AMaterial;
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
-        this.obstacles_basic();
-        // this.obstacles_dynamic();
-        // this.basicMesh();
-        this.complexMesh();
+
+        this.createScenesAndMeshes("truss", "dynamic");
+
         this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
             for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
             for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
@@ -95,6 +95,24 @@ export class MainSceneModel extends App2DSceneModel{
         }), "SpringColorSubscription")
     }
 
+    createScenesAndMeshes(meshOption: string, sceneOption: string) {
+        this.springs = [];
+        this.sceneShapes = [];
+        this.releaseChildren();
+        this.removeChildren(); 
+        this.releaseChildren();
+        this.removeChildren();
+
+
+        if (sceneOption == "basic") this.obstacles_basic();
+        else if (sceneOption == "dynamic") this.obstacles_dynamic();
+        else if (sceneOption == "cross") this.obstacles_cross();
+
+        if (meshOption == "basic") this.basicMesh();
+        else if (meshOption == "complex") this.complexMesh();
+        else if (meshOption == "truss") this.basicTrussMesh();
+    }
+
 
     basicTrussMesh() {
         let spring = new SpringModel();
@@ -106,27 +124,14 @@ export class MainSceneModel extends App2DSceneModel{
             new Vec2(2, 0),
             new Vec2(-1, 2),
             new Vec2(1, 2),
-            new Vec2(-1, -2),
-            new Vec2(1, -2),
-            // new Vec2(-4, 0), // If needed, uncomment these
-            // new Vec2(4, 0)  // If needed, uncomment these
         ];
         
         // Define the translation vector
         let tr = new Vec2(0, 10);
         
         // Shift all points up by the translation vector using a loop
-        for (let i = 0; i < points.length; i++) {
-            points[i] = points[i].add(tr);
-        }
-
-        // Add joints for all points using a loop
-        for (let i = 0; i < points.length; i++) {
-            spring.addJoint(points[i], this.polygonMaterial, this);
-        }
-        
-        // spring.addJoint(p7, this.polygonMaterial, this);
-        // spring.addJoint(p8, this.polygonMaterial, this);
+        for (let i = 0; i < points.length; i++) points[i] = points[i].add(tr);
+        for (let i = 0; i < points.length; i++) spring.addJoint(points[i], this.polygonMaterial, this);
 
         // Top half
         const edges: [number, number][] = [
@@ -143,18 +148,11 @@ export class MainSceneModel extends App2DSceneModel{
             spring.addEdge(i, j, Math.sqrt(points[i].add(points[j].times(-1)).dot(points[i].add(points[j].times(-1)))));
         }
 
-        // Bottom half
-        // spring.addEdge(0,5,Math.sqrt(p0.add(p5.times(-1)).dot(p0.add(p5.times(-1)))));
-        // spring.addEdge(1,5,Math.sqrt(p1.add(p5.times(-1)).dot(p1.add(p5.times(-1)))));
-        // spring.addEdge(1,6,Math.sqrt(p1.add(p6.times(-1)).dot(p1.add(p6.times(-1)))));
-        // spring.addEdge(2,6,Math.sqrt(p2.add(p6.times(-1)).dot(p2.add(p6.times(-1)))));
-        // spring.addEdge(5,6,Math.sqrt(p5.add(p6.times(-1)).dot(p5.add(p6.times(-1)))));
-
-        // Diagonal
-        // spring.addEdge(0,7,Math.sqrt(p0.add(p7.times(-1)).dot(p0.add(p7.times(-1)))));
-        // spring.addEdge(2,8,Math.sqrt(p2.add(p8.times(-1)).dot(p2.add(p8.times(-1)))));
-
-        spring.setPolys([this.myRect2.verts, this.myRect.verts, this.myRect3.verts, this.myRect4.verts, this.myTriangle.verts]);
+        let polys: VertexArray2D[] = [];
+        for (let scenePoly of this.sceneShapes) {
+            polys.push(scenePoly.verts.GetTransformedBy(scenePoly.transform as Mat3));
+        }
+        spring.setPolys(polys);
         
         this.addChild(spring);
         this.springs.push(spring);
@@ -187,12 +185,11 @@ export class MainSceneModel extends App2DSceneModel{
             }
         }
 
-        spring.setPolys([
-            this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
-            this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
-            this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
-            this.myTriangle.verts.GetTransformedBy(this.myTriangle.transform as Mat3)
-        ]);
+        let polys: VertexArray2D[] = [];
+        for (let scenePoly of this.sceneShapes) {
+            polys.push(scenePoly.verts.GetTransformedBy(scenePoly.transform as Mat3));
+        }
+        spring.setPolys(polys);
         this.addChild(spring);
         this.springs.push(spring);
     }
@@ -224,118 +221,80 @@ export class MainSceneModel extends App2DSceneModel{
         spring.addEdge(1,3,Math.sqrt(p1.add(p3.times(-1)).dot(p1.add(p3.times(-1)))));
         spring.addEdge(2,3,Math.sqrt(p2.add(p3.times(-1)).dot(p2.add(p3.times(-1)))));
 
-        spring.setPolys([
-            this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
-            this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
-            this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
-            this.myTriangle.verts.GetTransformedBy(this.myTriangle.transform as Mat3)
-        ]);
+        let polys: VertexArray2D[] = [];
+        for (let scenePoly of this.sceneShapes) {
+            polys.push(scenePoly.verts.GetTransformedBy(scenePoly.transform as Mat3));
+        }
+        spring.setPolys(polys);
+
 
         this.addChild(spring);
         this.springs.push(spring);
 
     }
 
-    myRect:Polygon2DModel = new Polygon2DModel();
-    myRect2:Polygon2DModel = new Polygon2DModel();
-    myRect3:Polygon2DModel = new Polygon2DModel();
-    myTriangle:Polygon2DModel = new Polygon2DModel();
-    myRect4:Polygon2DModel = new Polygon2DModel();
     obstacles_cross() {
-        this.myRect = new Polygon2DModel();
-        this.myRect.setMaterial(this.polygonMaterial);
-        this.myRect.verts.addVertex(new Vec2(-8, -5 + 1), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(8.5, -5), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(8.5, -4), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(-8, -4 + 1), Color.FromString("#aaaaaa"));
-        this.addChild(this.myRect);
+        let myRect = new Polygon2DModel();
+        myRect.setMaterial(this.polygonMaterial);
+        myRect.verts.addVertex(new Vec2(-8, -5 + 1), Color.FromString("#aaaaaa"));
+        myRect.verts.addVertex(new Vec2(8.5, -5), Color.FromString("#aaaaaa"));
+        myRect.verts.addVertex(new Vec2(8.5, -4), Color.FromString("#aaaaaa"));
+        myRect.verts.addVertex(new Vec2(-8, -4 + 1), Color.FromString("#aaaaaa"));
+        this.addChild(myRect);
+        this.sceneShapes.push(myRect);
 
-        this.myRect2 = new Polygon2DModel();
-        this.myRect2.setMaterial(this.polygonMaterial);
-        this.myRect2.verts.addVertex(new Vec2(8, 5), Color.FromString("#aaaaaa"));
-        this.myRect2.verts.addVertex(new Vec2(9, 5), Color.FromString("#aaaaaa"));
-        this.myRect2.verts.addVertex(new Vec2(9, -7), Color.FromString("#aaaaaa"));
-        this.myRect2.verts.addVertex(new Vec2(8, -7), Color.FromString("#aaaaaa"));
-        this.addChild(this.myRect2);
+        let myRect2 = new Polygon2DModel();
+        myRect2.setMaterial(this.polygonMaterial);
+        myRect2.verts.addVertex(new Vec2(8, 5), Color.FromString("#aaaaaa"));
+        myRect2.verts.addVertex(new Vec2(9, 5), Color.FromString("#aaaaaa"));
+        myRect2.verts.addVertex(new Vec2(9, -7), Color.FromString("#aaaaaa"));
+        myRect2.verts.addVertex(new Vec2(8, -7), Color.FromString("#aaaaaa"));
+        this.addChild(myRect2);
+        this.sceneShapes.push(myRect2);
 
     }
     obstacles_basic() {
-        this.myTriangle = new Polygon2DModel();
-        this.myTriangle.setMaterial(this.polygonMaterial);
-        this.myTriangle.verts.addVertex(new Vec2(-6, -5), Color.FromString("#aaaaaa"));
-        this.myTriangle.verts.addVertex(new Vec2(-2, -5), Color.FromString("#aaaaaa"));
-        this.myTriangle.verts.addVertex(new Vec2(-4, -1), Color.FromString("#aaaaaa"));
-        this.myTriangle.setTransform(Mat3.Translation2D(new Vec2(2.5, -.2)));
-        this.addChild(this.myTriangle);
+        let triangle = new Polygon2DModel();
+        triangle.setMaterial(this.polygonMaterial);
+        triangle.verts.addVertex(new Vec2(-6, -5), Color.FromString("#aaaaaa"));
+        triangle.verts.addVertex(new Vec2(-2, -5), Color.FromString("#aaaaaa"));
+        triangle.verts.addVertex(new Vec2(-4, -1), Color.FromString("#aaaaaa"));
+        triangle.setTransform(Mat3.Translation2D(new Vec2(2.5, -.2)));
+        this.addChild(triangle);
+        this.sceneShapes.push(triangle);
 
-        this.myRect = new Polygon2DModel();
-        this.myRect.setMaterial(this.polygonMaterial);
-        this.myRect.verts.addVertex(new Vec2(-8, -6), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(-8, -5), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(8, -5), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(8, -6), Color.FromString("#aaaaaa"));
-        this.addChild(this.myRect);
+        let rect = new Polygon2DModel();
+        rect.setMaterial(this.polygonMaterial);
+        rect.verts.addVertex(new Vec2(-8, -6), Color.FromString("#aaaaaa"));
+        rect.verts.addVertex(new Vec2(-8, -5), Color.FromString("#aaaaaa"));
+        rect.verts.addVertex(new Vec2(8, -5), Color.FromString("#aaaaaa"));
+        rect.verts.addVertex(new Vec2(8, -6), Color.FromString("#aaaaaa"));
+        this.addChild(rect);
+        this.sceneShapes.push(rect);
 
-        this.myRect2 = new Polygon2DModel();
-        this.myRect2.setMaterial(this.polygonMaterial);
-        this.myRect2.verts.addVertex(new Vec2(0, 0), Color.FromString("#aaaaaa"));
-        this.myRect2.verts.addVertex(new Vec2(0, 1), Color.FromString("#aaaaaa"));
-        this.myRect2.verts.addVertex(new Vec2(8, 1), Color.FromString("#aaaaaa"));
-        this.myRect2.verts.addVertex(new Vec2(8, 0), Color.FromString("#aaaaaa"));
-        this.myRect2.setTransform(Mat3.Rotation(Math.PI/4).times(Mat3.Translation2D(new Vec2(0, -3))));
-        this.addChild(this.myRect2);
+        let rect2 = new Polygon2DModel();
+        rect2.setMaterial(this.polygonMaterial);
+        rect2.verts.addVertex(new Vec2(0, 0), Color.FromString("#aaaaaa"));
+        rect2.verts.addVertex(new Vec2(0, 1), Color.FromString("#aaaaaa"));
+        rect2.verts.addVertex(new Vec2(8, 1), Color.FromString("#aaaaaa"));
+        rect2.verts.addVertex(new Vec2(8, 0), Color.FromString("#aaaaaa"));
+        rect2.setTransform(Mat3.Rotation(Math.PI/4).times(Mat3.Translation2D(new Vec2(0, -3))));
+        this.addChild(rect2);
+        this.sceneShapes.push(rect2);
 
-        this.myRect3 = new Polygon2DModel();
-        this.myRect3.setMaterial(this.polygonMaterial);
-        this.myRect3.verts.addVertex(new Vec2(0, 0), Color.FromString("#aaaaaa"));
-        this.myRect3.verts.addVertex(new Vec2(0, 1), Color.FromString("#aaaaaa"));
-        this.myRect3.verts.addVertex(new Vec2(8, 1), Color.FromString("#aaaaaa"));
-        this.myRect3.verts.addVertex(new Vec2(8, 0), Color.FromString("#aaaaaa"));
-        this.myRect3.setTransform(Mat3.Rotation(-Math.PI/4).times(Mat3.Translation2D(new Vec2(-10, 1))));
-        this.addChild(this.myRect3);
+        let rect3 = new Polygon2DModel();
+        rect3.setMaterial(this.polygonMaterial);
+        rect3.verts.addVertex(new Vec2(0, 0), Color.FromString("#aaaaaa"));
+        rect3.verts.addVertex(new Vec2(0, 1), Color.FromString("#aaaaaa"));
+        rect3.verts.addVertex(new Vec2(8, 1), Color.FromString("#aaaaaa"));
+        rect3.verts.addVertex(new Vec2(8, 0), Color.FromString("#aaaaaa"));
+        rect3.setTransform(Mat3.Rotation(-Math.PI/4).times(Mat3.Translation2D(new Vec2(-10, 1))));
+        this.addChild(rect3);
+        this.sceneShapes.push(rect3);
     }
 
     obstacles_dynamic() {
-        this.myTriangle = new Polygon2DModel();
-        this.myTriangle.setMaterial(this.polygonMaterial);
-        this.myTriangle.verts.addVertex(new Vec2(-5.5, -1), Color.FromString("#aaaaaa"));
-        this.myTriangle.verts.addVertex(new Vec2(-2.5, -1), Color.FromString("#aaaaaa"));
-        this.myTriangle.verts.addVertex(new Vec2(-4, 2), Color.FromString("#aaaaaa"));
-        this.addChild(this.myTriangle);
-
-        this.myRect = new Polygon2DModel();
-        this.myRect.setMaterial(this.polygonMaterial);
-        this.myRect.verts.addVertex(new Vec2(-8, -6), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(-8, -5), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(8, -5), Color.FromString("#aaaaaa"));
-        this.myRect.verts.addVertex(new Vec2(8, -6), Color.FromString("#aaaaaa"));
-        this.addChild(this.myRect);
-
-        this.myRect2 = new Polygon2DModel();
-        this.myRect2.setMaterial(this.polygonMaterial);
-        this.myRect2.verts.addVertex(new Vec2(-3, -0.25), Color.FromString("#777777"));
-        this.myRect2.verts.addVertex(new Vec2(-3, 0.25), Color.FromString("#777777"));
-        this.myRect2.verts.addVertex(new Vec2(3, 0.25), Color.FromString("#777777"));
-        this.myRect2.verts.addVertex(new Vec2(3, -0.25), Color.FromString("#777777"));
-        this.myRect2.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(Math.PI/4)));
-        this.addChild(this.myRect2);
-
-        this.myRect3 = new Polygon2DModel();
-        this.myRect3.setMaterial(this.polygonMaterial);
-        this.myRect3.verts.addVertex(new Vec2(-3, -0.25), Color.FromString("#777777"));
-        this.myRect3.verts.addVertex(new Vec2(-3, 0.25), Color.FromString("#777777"));
-        this.myRect3.verts.addVertex(new Vec2(3, 0.25), Color.FromString("#777777"));
-        this.myRect3.verts.addVertex(new Vec2(3, -0.25), Color.FromString("#777777"));
-        this.myRect3.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(-Math.PI/4)));
-        this.addChild(this.myRect3);
-
-        this.myRect4 = new Polygon2DModel();
-        this.myRect4.setMaterial(this.polygonMaterial);
-        this.myRect4.verts.addVertex(new Vec2(-5.5, -5), Color.FromString("#aaaaaa"));
-        this.myRect4.verts.addVertex(new Vec2(-2.5, -5), Color.FromString("#aaaaaa"));
-        this.myRect4.verts.addVertex(new Vec2(-2.5, -1), Color.FromString("#aaaaaa"));
-        this.myRect4.verts.addVertex(new Vec2(-5.5, -1), Color.FromString("#aaaaaa"));
-        this.addChild(this.myRect4);
+        
     }
 
 
@@ -343,21 +302,8 @@ export class MainSceneModel extends App2DSceneModel{
 
     timeUpdate(t: number) {
         try {
-            // this.myRect2.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(Math.PI/4)));
-            // this.myRect3.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(-Math.PI/4)));
-
-            // this.springs[0].setPolys([
-            //     this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
-            //     this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
-            //     this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
-            //     this.myRect4.verts.GetTransformedBy(this.myRect4.transform as Mat3)
-            // ])
             for (let spring of this.springs) spring.timeUpdate(t);
-            //for (let joint of this.joints) joint.setUniformColor(this.color);
-            //this.myRect2.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(Math.PI/4)));
-            //this.myRect3.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(-Math.PI/4)));
         }
-
         catch(e) {
             if(nErrors<1){
                 console.error(e);
