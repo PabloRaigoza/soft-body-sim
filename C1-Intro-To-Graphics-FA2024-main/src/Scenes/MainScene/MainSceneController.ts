@@ -225,10 +225,13 @@ export class MainSceneController extends App2DSceneController{
                     // //         this.springModel.impulse(cursorPosition.clone());
                     // //     }
                     // // }
-                    if (event.key === 'w' || event.key === 'ArrowUp') this.springModel.keyImpulse(V2(0, 1));
-                    if (event.key === 's' || event.key === 'ArrowDown') this.springModel.keyImpulse(V2(0, -1));
-                    if (event.key === 'a' || event.key === 'ArrowLeft') this.springModel.keyImpulse(V2(-1, 0));
-                    if (event.key === 'd' || event.key === 'ArrowRight') this.springModel.keyImpulse(V2(1, 0));
+                    if (event.key === 'w' || event.key === 'ArrowUp') {
+                        this.springModel.keyImpulse(V2(0, 1));
+                        this.labCatModel.visible = false;
+                    }
+                    else if (event.key === 's' || event.key === 'ArrowDown') this.springModel.keyImpulse(V2(0, -1));
+                    else if (event.key === 'a' || event.key === 'ArrowLeft') this.springModel.keyImpulse(V2(-1, 0));
+                    else if (event.key === 'd' || event.key === 'ArrowRight') this.springModel.keyImpulse(V2(1, 0));
                 },
                 // onClick:(event:AInteractionEvent)=>{
                 //     let ndcCursor = event.ndcCursor;
@@ -296,8 +299,8 @@ export class MainSceneController extends App2DSceneController{
                         this.springModel.dragEnd();
                         this.springModel.signalGeometryUpdate();
 
-                        this.labCatModel.visible = false;
                     }
+                    this.labCatModel.visible = false;
                     // console.log('drag end')
                 },
             }

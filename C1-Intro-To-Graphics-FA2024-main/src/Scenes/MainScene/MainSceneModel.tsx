@@ -49,7 +49,7 @@ export class MainSceneModel extends App2DSceneModel{
         appState.addSliderIfMissing("JointRadius", 0.1, 0, 0.3, 0.01);
         appState.addColorControl("SpringColor", Color.FromRGBA([1, 1, 1, 1]));
         appState.addColorControl("SceneColor", Color.FromString('#3fff03'));
-        appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.01, 0.0001);
+        appState.addSliderIfMissing("Gravity", 0.002, -0.02, 0.03, 0.0001);
         appState.addSliderIfMissing("t", 1, 0.1, 1, 0.1);
         appState.addSliderIfMissing("ImpulseScale", 0.3, -0.4, 0.4, 0.01);
         appState.addSliderIfMissing("MeshSize", 1, 0.1, 2, 0.1);
@@ -295,12 +295,12 @@ export class MainSceneModel extends App2DSceneModel{
         spring.addJoint(p2, this.polygonMaterial, this, this.radius);
         spring.addJoint(p3, this.polygonMaterial, this, this.radius);
 
-        spring.addEdge(0,1,this.gSz * Math.sqrt(p0.minus(p1).dot(p0.minus(p1))));
-        spring.addEdge(0,2,this.gSz * Math.sqrt(p0.minus(p2).dot(p0.minus(p2))));
-        spring.addEdge(0,3,this.gSz * Math.sqrt(p0.minus(p3).dot(p0.minus(p3))));
-        spring.addEdge(1,2,this.gSz * Math.sqrt(p1.minus(p2).dot(p1.minus(p2))));
-        spring.addEdge(1,3,this.gSz * Math.sqrt(p1.minus(p3).dot(p1.minus(p3))));
-        spring.addEdge(2,3,this.gSz * Math.sqrt(p2.minus(p3).dot(p2.minus(p3))));
+        spring.addEdge(0,1,2*this.gSz * Math.sqrt(p0.minus(p1).dot(p0.minus(p1))));
+        spring.addEdge(0,2,2*this.gSz * Math.sqrt(p0.minus(p2).dot(p0.minus(p2))));
+        spring.addEdge(0,3,2*this.gSz * Math.sqrt(p0.minus(p3).dot(p0.minus(p3))));
+        spring.addEdge(1,2,2*this.gSz * Math.sqrt(p1.minus(p2).dot(p1.minus(p2))));
+        spring.addEdge(1,3,2*this.gSz * Math.sqrt(p1.minus(p3).dot(p1.minus(p3))));
+        spring.addEdge(2,3,2*this.gSz * Math.sqrt(p2.minus(p3).dot(p2.minus(p3))));
 
         let polys: VertexArray2D[] = [];
         for (let scenePoly of this.sceneShapes) {
@@ -406,19 +406,19 @@ export class MainSceneModel extends App2DSceneModel{
     obstacles_cross() {
         let myRect = new Polygon2DModel();
         myRect.setMaterial(this.polygonMaterial);
-        myRect.verts.addVertex(new Vec2(-8, -5 + 1), Color.FromString("#3fff03"));
-        myRect.verts.addVertex(new Vec2(8.5, -5), Color.FromString("#3fff03"));
-        myRect.verts.addVertex(new Vec2(8.5, -4), Color.FromString("#3fff03"));
-        myRect.verts.addVertex(new Vec2(-8, -4 + 1), Color.FromString("#3fff03"));
+        myRect.verts.addVertex(new Vec2(-8, -5 + 1), GetAppState().getState("SceneColor"));
+        myRect.verts.addVertex(new Vec2(8.5, -5), GetAppState().getState("SceneColor"));
+        myRect.verts.addVertex(new Vec2(8.5, -4), GetAppState().getState("SceneColor"));
+        myRect.verts.addVertex(new Vec2(-8, -4 + 1), GetAppState().getState("SceneColor"));
         this.addChild(myRect);
         this.sceneShapes.push(myRect);
 
         let myRect2 = new Polygon2DModel();
         myRect2.setMaterial(this.polygonMaterial);
-        myRect2.verts.addVertex(new Vec2(8, 5), Color.FromString("#3fff03"));
-        myRect2.verts.addVertex(new Vec2(9, 5), Color.FromString("#3fff03"));
-        myRect2.verts.addVertex(new Vec2(9, -7), Color.FromString("#3fff03"));
-        myRect2.verts.addVertex(new Vec2(8, -7), Color.FromString("#3fff03"));
+        myRect2.verts.addVertex(new Vec2(8, 5), GetAppState().getState("SceneColor"));
+        myRect2.verts.addVertex(new Vec2(9, 5), GetAppState().getState("SceneColor"));
+        myRect2.verts.addVertex(new Vec2(9, -7), GetAppState().getState("SceneColor"));
+        myRect2.verts.addVertex(new Vec2(8, -7), GetAppState().getState("SceneColor"));
         this.addChild(myRect2);
         this.sceneShapes.push(myRect2);
 
@@ -426,38 +426,38 @@ export class MainSceneModel extends App2DSceneModel{
     obstacles_basic() {
         let triangle = new Polygon2DModel();
         triangle.setMaterial(this.polygonMaterial);
-        triangle.verts.addVertex(new Vec2(-6, -5), Color.FromString("#3fff03"));
-        triangle.verts.addVertex(new Vec2(-2, -5), Color.FromString("#3fff03"));
-        triangle.verts.addVertex(new Vec2(-4, -1), Color.FromString("#3fff03"));
-        triangle.setTransform(Mat3.Translation2D(new Vec2(2.5, -.2)));
+        triangle.verts.addVertex(new Vec2(-6, -5), GetAppState().getState("SceneColor"));
+        triangle.verts.addVertex(new Vec2(-2, -5), GetAppState().getState("SceneColor"));
+        triangle.verts.addVertex(new Vec2(-4, -1), GetAppState().getState("SceneColor"));
+        triangle.setTransform(Mat3.Translation2D(new Vec2(-2, -.2)));
         this.addChild(triangle);
         this.sceneShapes.push(triangle);
 
         let rect = new Polygon2DModel();
         rect.setMaterial(this.polygonMaterial);
-        rect.verts.addVertex(new Vec2(-8, -6), Color.FromString("#3fff03"));
-        rect.verts.addVertex(new Vec2(-8, -5), Color.FromString("#3fff03"));
-        rect.verts.addVertex(new Vec2(8, -5), Color.FromString("#3fff03"));
-        rect.verts.addVertex(new Vec2(8, -6), Color.FromString("#3fff03"));
+        rect.verts.addVertex(new Vec2(-8, -6), GetAppState().getState("SceneColor"));
+        rect.verts.addVertex(new Vec2(-8, -5), GetAppState().getState("SceneColor"));
+        rect.verts.addVertex(new Vec2(8, -5), GetAppState().getState("SceneColor"));
+        rect.verts.addVertex(new Vec2(8, -6), GetAppState().getState("SceneColor"));
         this.addChild(rect);
         this.sceneShapes.push(rect);
 
         let rect2 = new Polygon2DModel();
         rect2.setMaterial(this.polygonMaterial);
-        rect2.verts.addVertex(new Vec2(0, 0), Color.FromString("#3fff03"));
-        rect2.verts.addVertex(new Vec2(0, 1), Color.FromString("#3fff03"));
-        rect2.verts.addVertex(new Vec2(8, 1), Color.FromString("#3fff03"));
-        rect2.verts.addVertex(new Vec2(8, 0), Color.FromString("#3fff03"));
+        rect2.verts.addVertex(new Vec2(0, 0), GetAppState().getState("SceneColor"));
+        rect2.verts.addVertex(new Vec2(0, 1), GetAppState().getState("SceneColor"));
+        rect2.verts.addVertex(new Vec2(8, 1), GetAppState().getState("SceneColor"));
+        rect2.verts.addVertex(new Vec2(8, 0), GetAppState().getState("SceneColor"));
         rect2.setTransform(Mat3.Rotation(Math.PI/4).times(Mat3.Translation2D(new Vec2(0, -3))));
         this.addChild(rect2);
         this.sceneShapes.push(rect2);
 
         let rect3 = new Polygon2DModel();
         rect3.setMaterial(this.polygonMaterial);
-        rect3.verts.addVertex(new Vec2(0, 0), Color.FromString("#3fff03"));
-        rect3.verts.addVertex(new Vec2(0, 1), Color.FromString("#3fff03"));
-        rect3.verts.addVertex(new Vec2(8, 1), Color.FromString("#3fff03"));
-        rect3.verts.addVertex(new Vec2(8, 0), Color.FromString("#3fff03"));
+        rect3.verts.addVertex(new Vec2(0, 0), GetAppState().getState("SceneColor"));
+        rect3.verts.addVertex(new Vec2(0, 1), GetAppState().getState("SceneColor"));
+        rect3.verts.addVertex(new Vec2(8, 1), GetAppState().getState("SceneColor"));
+        rect3.verts.addVertex(new Vec2(8, 0), GetAppState().getState("SceneColor"));
         rect3.setTransform(Mat3.Rotation(-Math.PI/4).times(Mat3.Translation2D(new Vec2(-10, 1))));
         this.addChild(rect3);
         this.sceneShapes.push(rect3);
@@ -467,37 +467,37 @@ export class MainSceneModel extends App2DSceneModel{
         this.isDynamicScene = true;
         let leftWall = new Polygon2DModel();
         leftWall.setMaterial(this.polygonMaterial);
-        leftWall.verts.addVertex(new Vec2(-15, 8), Color.FromString("#3fff03"));
-        leftWall.verts.addVertex(new Vec2(-7, 8), Color.FromString("#3fff03"));
-        leftWall.verts.addVertex(new Vec2(-7, -8), Color.FromString("#3fff03"));
-        leftWall.verts.addVertex(new Vec2(-15, -8), Color.FromString("#3fff03"));
+        leftWall.verts.addVertex(new Vec2(-15, 8), GetAppState().getState("SceneColor"));
+        leftWall.verts.addVertex(new Vec2(-7, 8), GetAppState().getState("SceneColor"));
+        leftWall.verts.addVertex(new Vec2(-7, -8), GetAppState().getState("SceneColor"));
+        leftWall.verts.addVertex(new Vec2(-15, -8), GetAppState().getState("SceneColor"));
         this.addChild(leftWall);
         this.sceneShapes.push(leftWall);
 
         let bottomWall = new Polygon2DModel();
         bottomWall.setMaterial(this.polygonMaterial);
-        bottomWall.verts.addVertex(new Vec2(-10, -8), Color.FromString("#3fff03"));
-        bottomWall.verts.addVertex(new Vec2(10, -8), Color.FromString("#3fff03"));
-        bottomWall.verts.addVertex(new Vec2(10, -20), Color.FromString("#3fff03"));
-        bottomWall.verts.addVertex(new Vec2(-10, -20), Color.FromString("#3fff03"));
+        bottomWall.verts.addVertex(new Vec2(-10, -8), GetAppState().getState("SceneColor"));
+        bottomWall.verts.addVertex(new Vec2(10, -8), GetAppState().getState("SceneColor"));
+        bottomWall.verts.addVertex(new Vec2(10, -20), GetAppState().getState("SceneColor"));
+        bottomWall.verts.addVertex(new Vec2(-10, -20), GetAppState().getState("SceneColor"));
         this.addChild(bottomWall);
         this.sceneShapes.push(bottomWall);
 
         let rightWall = new Polygon2DModel();
         rightWall.setMaterial(this.polygonMaterial);
-        rightWall.verts.addVertex(new Vec2(7, 8), Color.FromString("#3fff03"));
-        rightWall.verts.addVertex(new Vec2(15, 8), Color.FromString("#3fff03"));
-        rightWall.verts.addVertex(new Vec2(15, -8), Color.FromString("#3fff03"));
-        rightWall.verts.addVertex(new Vec2(7, -8), Color.FromString("#3fff03"));
+        rightWall.verts.addVertex(new Vec2(7, 8), GetAppState().getState("SceneColor"));
+        rightWall.verts.addVertex(new Vec2(15, 8), GetAppState().getState("SceneColor"));
+        rightWall.verts.addVertex(new Vec2(15, -8), GetAppState().getState("SceneColor"));
+        rightWall.verts.addVertex(new Vec2(7, -8), GetAppState().getState("SceneColor"));
         this.addChild(rightWall);
         this.sceneShapes.push(rightWall);
 
         let bottomPeg = new Polygon2DModel();
         bottomPeg.setMaterial(this.polygonMaterial);
-        bottomPeg.verts.addVertex(new Vec2(-1, -8), Color.FromString("#3fff03"));
-        bottomPeg.verts.addVertex(new Vec2(1, -8), Color.FromString("#3fff03"));
-        bottomPeg.verts.addVertex(new Vec2(1, -20), Color.FromString("#3fff03"));
-        bottomPeg.verts.addVertex(new Vec2(-1, -20), Color.FromString("#3fff03"));
+        bottomPeg.verts.addVertex(new Vec2(-1, -8), GetAppState().getState("SceneColor"));
+        bottomPeg.verts.addVertex(new Vec2(1, -8), GetAppState().getState("SceneColor"));
+        bottomPeg.verts.addVertex(new Vec2(1, -20), GetAppState().getState("SceneColor"));
+        bottomPeg.verts.addVertex(new Vec2(-1, -20), GetAppState().getState("SceneColor"));
         this.addChild(bottomPeg);
         this.sceneShapes.push(bottomPeg);
     }
