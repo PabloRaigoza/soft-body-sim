@@ -17,6 +17,8 @@ let nErrors = 0;
 export class MainSceneModel extends App2DSceneModel{
     _splines:SplineModel[] = [];
     color:Color = Color.FromRGBA([1, 0, 0, 1]);
+    current_scene: string = "basic";
+    current_mesh: string = "simple";
 
     get splines():SplineModel[]{
         return this._splines;
@@ -36,7 +38,8 @@ export class MainSceneModel extends App2DSceneModel{
         appState.addSliderIfMissing("SpringStiffness", 0.3, 0.01, 0.5, 0.01);
         appState.addSliderIfMissing("JointRadius", 0.1, 0, 0.3, 0.01);
         appState.addColorControl("SpringColor", Color.FromRGBA([1, 1, 1, 1]));
-        appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.005, 0.0001);
+        appState.addColorControl("SceneColor", Color.FromString('#aaaaaa'));
+        appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.01, 0.0001);
         appState.addSliderIfMissing("t", 1, 0.1, 1, 0.1);
         appState.addSliderIfMissing("ImpulseScale", 0.1, -0.4, 0.4, 0.01);
     }
@@ -98,6 +101,10 @@ export class MainSceneModel extends App2DSceneModel{
         this.subscribe(appState.addStateValueListener("ImpulseScale", (newValue)=>{
             this.springs[0].setImpulse(newValue);
         }), "ImpulseSubscription")
+        this.subscribe(appState.addStateValueListener("SceneColor", (newValue)=>{
+            for (let shape of this.sceneShapes) shape.setUniformColor(newValue);
+            for (let shape of this.sceneShapes) shape.signalGeometryUpdate();
+        }), "SceneColorSubscription")
     }
 
     createScenesAndMeshes(meshOption: string, sceneOption: string) {
@@ -107,14 +114,22 @@ export class MainSceneModel extends App2DSceneModel{
         this.removeChildren(); 
         this.releaseChildren();
         this.removeChildren();
+        this.releaseChildren();
+        this.removeChildren();
+        this.releaseChildren();
+        this.removeChildren();
+        this.releaseChildren();
+        this.removeChildren();
 
+        this.current_mesh = meshOption;
+        this.current_scene = sceneOption;
 
         if (sceneOption == "basic") this.obstacles_basic();
         else if (sceneOption == "dynamic") this.obstacles_dynamic();
         else if (sceneOption == "cross") this.obstacles_cross();
 
-        if (meshOption == "basic") this.basicMesh();
-        else if (meshOption == "complex") this.complexMesh();
+        if (meshOption == "simple") this.basicMesh();
+        else if (meshOption == "mesh") this.complexMesh();
         else if (meshOption == "truss") this.basicTrussMesh();
         else if (meshOption == "circular") this.circularMesh();
     }
