@@ -7,7 +7,10 @@ import {
     AInteractionEvent,
     AKeyboardInteraction, ANodeModel, ANodeView,
     Color,
-    GetAppState, LineSegmentsModel2D, LineSegmentsView2D, V2
+    GetAppState, LineSegmentsModel2D, LineSegmentsView2D, V2,
+    A2DMeshView,
+    ASVGView,
+    Mat3
 } from "../../anigraph";
 import {Polygon2DModel, Polygon2DView} from "../../anigraph/starter/nodes/polygon2D";
 import {MyCustomModel, MyCustomView, SplineModel, SplineView} from "./nodes";
@@ -19,6 +22,8 @@ import { SpringModel } from "./nodes/Spring/SpringModel";
 import { SpringView } from "./nodes/Spring/SpringView";
 import { GeometryModel } from "./nodes/Geometry/GeometryModel";
 import { GeometryView } from "./nodes/Geometry/GeometryView";
+import { LabCatFloationgHeadModel } from "Scenes/Example2/nodes/LabCatFloatingHead/LabCatFloationgHeadModel";
+import { CustomSVGModel } from "Scenes/Example2/nodes/CustomSVGModel";
 
 /**
  * This is your Scene Controller class. The scene controller is responsible for managing user input with the keyboard
@@ -38,6 +43,10 @@ export class MainSceneController extends App2DSceneController{
 
     get springModel() {
         return this.model.springs[0];
+    }
+
+    get labCatModel(){
+        return this.model.labCatVectorHead;
     }
 
 
@@ -163,6 +172,8 @@ export class MainSceneController extends App2DSceneController{
         this.addModelViewSpec(SpringModel, SpringView);
         this.addModelViewSpec(GeometryModel, GeometryView);
         this.addModelViewSpec(JointModel, JointView);
+        this.addModelViewSpec(LabCatFloationgHeadModel, A2DMeshView);
+        this.addModelViewSpec(CustomSVGModel, ASVGView);
     }
 
     /**
@@ -215,20 +226,46 @@ export class MainSceneController extends App2DSceneController{
                     if (event.key === 'a' || event.key === 'ArrowLeft') this.springModel.keyImpulse(V2(-1, 0));
                     if (event.key === 'd' || event.key === 'ArrowRight') this.springModel.keyImpulse(V2(1, 0));
                 },
-                onClick:(event:AInteractionEvent)=>{
+                // onClick:(event:AInteractionEvent)=>{
+                //     let ndcCursor = event.ndcCursor;
+                //     if (ndcCursor) {
+                //         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                //         this.springModel.cursorImpulse(cursorPosition.clone());
+                //     }
+                // },
+                onMouseMove:(event:AInteractionEvent)=>{
                     let ndcCursor = event.ndcCursor;
                     if (ndcCursor) {
                         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                        this.springModel.cursorImpulse(cursorPosition.clone());
+                        let someJointPos = this.springModel.joints[0].position.clone();
+
+                        // Compute rotation angle (radians) heading
+                        let heading = cursorPosition.minus(someJointPos);
+                        let angle = Math.atan2(heading.y, heading.x) - Math.PI/2;
+
+                        this.labCatModel.setTransform(
+                            // Mat3.Scale2D(3).times(Mat3.Translation2D(cursorPosition))
+                            // Mat3.Translation2D(cursorPosition).times(Mat3.Scale2D(3))
+                            Mat3.Translation2D(cursorPosition)
+                                .times(Mat3.Rotation(angle))
+                                .times(Mat3.Scale2D(3))
+                        )
                     }
                 },
                 onDragStart:(event:AInteractionEvent, interaction:ADragInteraction)=>{
                     let ndcCursor = event.ndcCursor;
                     if (ndcCursor) {
                         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                        this.springModel.dragStart(cursorPosition);
-                        this.springModel.signalGeometryUpdate();
+                        if (this.springModel.dragStart(cursorPosition)) {
+                            this.springModel.signalGeometryUpdate();
+                        } else {
+                            let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                            this.springModel.cursorImpulse(cursorPosition.clone());
+                            this.labCatModel.visible = true;
+                        }
+
                     }
+                    // console.log('drag start')
                 },
                 onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
                     let ndcCursor = event.ndcCursor;
@@ -236,6 +273,11 @@ export class MainSceneController extends App2DSceneController{
                         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
                         this.springModel.dragging(cursorPosition);
                         this.springModel.signalGeometryUpdate();
+
+                        if (this.springModel.selected_joint == -1) {
+                            let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                            this.springModel.cursorImpulse(cursorPosition.clone());
+                        }
                     }
                 },
                 onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{
@@ -243,7 +285,10 @@ export class MainSceneController extends App2DSceneController{
                     if (ndcCursor) {
                         this.springModel.dragEnd();
                         this.springModel.signalGeometryUpdate();
+
+                        this.labCatModel.visible = false;
                     }
+                    // console.log('drag end')
                 },
             }
         )

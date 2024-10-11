@@ -1,4 +1,4 @@
-import {AppState, Color, DefaultMaterials, GetAppState, Polygon2D, V2, V3, AParticle2D, Vec2, Mat3, LineSegmentsModel2D, LineSegmentsView2D, AObjectNode, ALineSegmentsGraphic, VertexArray2D} from "../../anigraph";
+import {AppState, Color, DefaultMaterials, GetAppState, Polygon2D, V2, V3, AParticle2D, Vec2, Mat3, LineSegmentsModel2D, LineSegmentsView2D, AObjectNode, ALineSegmentsGraphic, VertexArray2D, SVGAsset, AMaterialManager} from "../../anigraph";
 import {App2DSceneModel} from "../../anigraph/starter/App2D/App2DSceneModel";
 import {AMaterial} from "../../anigraph";
 import { SplineModel } from "./nodes";
@@ -7,6 +7,10 @@ import { JointModel } from "./nodes/Joint/JointModel";
 import { GeometryModel } from "./nodes/Geometry/GeometryModel";
 import { NodeTransform2D } from "../../anigraph/math";
 import { Polygon2DModel } from "anigraph/starter/nodes/polygon2D";
+import { CatModel } from "Scenes/Catamari/nodes";
+import { CustomSVGModel } from "Scenes/Example2/nodes/CustomSVGModel";
+import { LabCatFloationgHeadModel } from "Scenes/Example2/nodes/LabCatFloatingHead/LabCatFloationgHeadModel";
+import React from "react";
 
 let nErrors = 0;
 
@@ -28,6 +32,10 @@ export class MainSceneModel extends App2DSceneModel{
         return this._splines[this._splines.length-1];
     }
 
+    labCatFloatingHead!:LabCatFloationgHeadModel;
+    labCatSVG!:SVGAsset;
+    labCatVectorHead!:CustomSVGModel;
+
     /**
      * This will add variables to the control pannel
      * @param appState
@@ -42,6 +50,22 @@ export class MainSceneModel extends App2DSceneModel{
         appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.01, 0.0001);
         appState.addSliderIfMissing("t", 1, 0.1, 1, 0.1);
         appState.addSliderIfMissing("ImpulseScale", 0.1, -0.4, 0.4, 0.01);
+    }
+
+    async PreloadAssets(): Promise<void> {
+        await super.PreloadAssets();
+        let appState = GetAppState();
+
+        /**
+         * We will talk about shaders later in the semester. For now, just know that each one of these is something like
+         * a material used for rendering objects.
+          */
+        await appState.loadShaderMaterialModel(AMaterialManager.DefaultMaterials.INSTANCED_TEXTURE2D_SHADER);
+        await appState.loadShaderMaterialModel(AMaterialManager.DefaultMaterials.PARTICLE_TEXTURE_2D_SHADER);
+        await appState.loadShaderMaterialModel(DefaultMaterials.TEXTURED2D_SHADER);
+        // await this.loadTexture( "./images/gradientParticle.png", "GaussianSplat")
+        this.labCatSVG = await SVGAsset.Load("./images/svg/LabCatVectorHead.svg");
+        await LabCatFloationgHeadModel.PreloadAssets();
     }
 
     /**
@@ -69,12 +93,23 @@ export class MainSceneModel extends App2DSceneModel{
     sceneShapes: Polygon2DModel[] = [];
     isDynamicScene:boolean = false;
     polygonMaterial!:AMaterial;
+    catModel: CatModel = new CatModel();
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
 
         this.createScenesAndMeshes("mesh", "dynamic");
+        // appState.setState("LabCatScale", 1.0);
+        // appState.setReactGUIContentFunction(
+        //     (props:{appState:AppState})=>{
+        //         return (
+        //             <React.Fragment>
+        //             {`Lab Cat head scale is ${props.appState.getState("LabCatScale")}`}
+        //             </React.Fragment>
+        //         );
+        //     }
+        // );
 
         this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
             // console.log('joings')
@@ -137,6 +172,10 @@ export class MainSceneModel extends App2DSceneModel{
         else if (meshOption == "mesh") this.complexMesh();
         else if (meshOption == "truss") this.basicTrussMesh();
         else if (meshOption == "circular") this.circularMesh();
+        
+        this.labCatVectorHead = new CustomSVGModel(this.labCatSVG);
+        // this.labCatVectorHead.zValue = 10;
+        this.addChild(this.labCatVectorHead);
     }
 
 
