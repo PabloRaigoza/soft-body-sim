@@ -43,13 +43,15 @@ export class SpringModel extends ANodeModel2D {
         this.verts.initColorAttribute()
     }
 
-    addJoint(pos: Vec2, mat: AMaterial, ctx:MainSceneModel) {
+    addJoint(pos: Vec2, mat: AMaterial, ctx:MainSceneModel, radius: number) {
         let joint = new JointModel();
         joint.setPos(pos);
+        joint.setJointRadius(radius);
         joint.setMaterial(mat);
         this.joints.push(joint);
         // this.verts.addVertex(joint.position, Color.White());
         ctx.addChild(joint);
+        this.signalGeometryUpdate();
     }
 
     addEdge(i: number, j: number, l: number) {

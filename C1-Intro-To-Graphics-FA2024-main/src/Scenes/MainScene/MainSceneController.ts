@@ -46,11 +46,14 @@ export class MainSceneController extends App2DSceneController{
      * Check out Lab Cat's helpful Example2 scene for example code that sets the background to an image.
      * @returns {Promise<void>}
      */
-    async initScene(): Promise<void> {
+    async initScene(){
         // You can set the clear color for the rendering context
-        await super.initScene();
-        this.setClearColor(Color.FromString('#323232'));
         this.initControlPanelControls();
+        super.initScene();
+        this.setClearColor(Color.FromString('#323232'));
+
+        // await this.model.loadTexture('.images/hexagon_background.jpg', "BG");
+        // this.view.setBackgroundTexture(this.model.getTexture("BG"));
         // Subscribe to stuff if desired...
         // const self = this;
         // this.subscribe()
