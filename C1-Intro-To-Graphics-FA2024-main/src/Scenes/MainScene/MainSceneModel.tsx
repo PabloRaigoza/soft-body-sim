@@ -67,16 +67,18 @@ export class MainSceneModel extends App2DSceneModel{
                             
     springs:SpringModel[] = [];
     sceneShapes: Polygon2DModel[] = [];
-    isDynamicScene:boolean = true;
+    isDynamicScene:boolean = false;
     polygonMaterial!:AMaterial;
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
 
-        this.createScenesAndMeshes("complex", "dynamic");
+        this.createScenesAndMeshes("mesh", "dynamic");
 
         this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
+            // console.log('joings')
+            // for (let joint of this.springs[0].joints
             for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
             for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
         }), "JointColorSubscription")
@@ -108,8 +110,9 @@ export class MainSceneModel extends App2DSceneModel{
     }
 
     createScenesAndMeshes(meshOption: string, sceneOption: string) {
-        this.springs = [];
+        this.springs = [];  
         this.sceneShapes = [];
+        this.isDynamicScene = false;
         this.releaseChildren();
         this.removeChildren(); 
         this.releaseChildren();
@@ -120,6 +123,8 @@ export class MainSceneModel extends App2DSceneModel{
         this.removeChildren();
         this.releaseChildren();
         this.removeChildren();
+
+        // console.log('here')  
 
         this.current_mesh = meshOption;
         this.current_scene = sceneOption;
@@ -387,6 +392,7 @@ export class MainSceneModel extends App2DSceneModel{
     }
 
     obstacles_dynamic() {
+        this.isDynamicScene = true;
         let leftWall = new Polygon2DModel();
         leftWall.setMaterial(this.polygonMaterial);
         leftWall.verts.addVertex(new Vec2(-15, 8), Color.FromString("#aaaaaa"));
