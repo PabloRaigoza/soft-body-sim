@@ -83,8 +83,8 @@ export class JointModel extends ANodeModel2D{
         this._dt = dt;
     }
 
-    reradius(){
-        let pnts = Polygon2D.CircleVArray(this._radius, 15);
+    reradius(radius: number){
+        let pnts = Polygon2D.CircleVArray(radius, 15);
         let newVerts = new VertexArray2D();
         newVerts.initColorAttribute();
         for (let i = 0; i < pnts.nVerts; i++)

@@ -126,7 +126,7 @@ export class MainSceneModel extends App2DSceneModel{
         this.subscribe(appState.addStateValueListener("JointRadius", (newValue)=>{ 
             this.radius = newValue;
             for (let joint of this.springs[0].joints) joint.setJointRadius(newValue);
-            for (let joint of this.springs[0].joints) joint.reradius();
+            for (let joint of this.springs[0].joints) joint.reradius(newValue);
         }), "RadiusSubscription")
         this.subscribe(appState.addStateValueListener("SpringColor", (newValue)=>{
             this.springs[0].setColor(newValue); 
@@ -148,8 +148,7 @@ export class MainSceneModel extends App2DSceneModel{
         }), "SceneColorSubscription")
         this.subscribe(appState.addStateValueListener("MeshSize", (newValue)=>{
             this.gSz = newValue;
-            for (let joint of this.springs[0].joints) joint.setJointRadius(this.radius);
-            for (let joint of this.springs[0].joints) joint.reradius();
+            for (let joint of this.springs[0].joints) joint.reradius(this.radius);
             this.createScenesAndMeshes(this.current_mesh, this.current_scene);
         }), "MeshSizeSubscription")
     }
