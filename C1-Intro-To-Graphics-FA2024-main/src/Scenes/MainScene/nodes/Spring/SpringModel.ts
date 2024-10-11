@@ -24,7 +24,7 @@ export class SpringModel extends ANodeModel2D {
     lineWidth: number = 0.003;
     damping: number = 0.00;
     stiffness: number = 0.3;
-    _impulse: number = 0.1;
+    _impulse: number = 0.3;
     color: Color = Color.FromRGBA(1, 1, 1, 1);
     edges: Vec3[] = [];
     _polys: VertexArray2D[] = [];
@@ -123,7 +123,7 @@ export class SpringModel extends ANodeModel2D {
             for (let joint of this.joints) {
                 let normal = joint.position.minus(cursor);
                 normal.normalize();
-                joint.applyForce(normal.times(this._impulse/10));
+                joint.applyForce(normal.times(this._impulse/20));
             }
         }
         this.cursorImpulses = [];

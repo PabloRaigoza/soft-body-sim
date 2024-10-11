@@ -51,7 +51,7 @@ export class MainSceneModel extends App2DSceneModel{
         appState.addColorControl("SceneColor", Color.FromString('#3fff03'));
         appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.01, 0.0001);
         appState.addSliderIfMissing("t", 1, 0.1, 1, 0.1);
-        appState.addSliderIfMissing("ImpulseScale", 0.1, -0.4, 0.4, 0.01);
+        appState.addSliderIfMissing("ImpulseScale", 0.3, -0.4, 0.4, 0.01);
         appState.addSliderIfMissing("MeshSize", 1, 0.1, 2, 0.1);
     }
 
@@ -113,12 +113,13 @@ export class MainSceneModel extends App2DSceneModel{
         //         );
         //     }
         // );
-
+        // this.labCatVectorHead.visible = false;
         this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
             // console.log('joings')
             // for (let joint of this.springs[0].joints
             for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
             for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
+            
         }), "JointColorSubscription")
         this.subscribe(appState.addStateValueListener("SpringStiffness", (newValue)=>{
             this.springs[0].setStiff(newValue);
@@ -151,6 +152,8 @@ export class MainSceneModel extends App2DSceneModel{
             for (let joint of this.springs[0].joints) joint.reradius(this.radius);
             this.createScenesAndMeshes(this.current_mesh, this.current_scene);
         }), "MeshSizeSubscription")
+
+        
     }
 
     createScenesAndMeshes(meshOption: string, sceneOption: string) {
@@ -183,6 +186,10 @@ export class MainSceneModel extends App2DSceneModel{
         else if (meshOption == "circular") this.circularMesh();
         
         this.labCatVectorHead = new CustomSVGModel(this.labCatSVG);
+        this.labCatVectorHead.setTransform(
+            Mat3.Translation2D(new Vec2(100, 100))
+        )
+        // this.labCatVectorHead.visible = false;
         // this.labCatVectorHead.zValue = 10;
         this.addChild(this.labCatVectorHead);
     }

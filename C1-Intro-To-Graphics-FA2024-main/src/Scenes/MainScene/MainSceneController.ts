@@ -10,7 +10,8 @@ import {
     GetAppState, LineSegmentsModel2D, LineSegmentsView2D, V2,
     A2DMeshView,
     ASVGView,
-    Mat3
+    Mat3,
+    Mat4
 } from "../../anigraph";
 import {Polygon2DModel, Polygon2DView} from "../../anigraph/starter/nodes/polygon2D";
 import {MyCustomModel, MyCustomView, SplineModel, SplineView} from "./nodes";
@@ -246,13 +247,19 @@ export class MainSceneController extends App2DSceneController{
                         let heading = cursorPosition.minus(someJointPos);
                         let angle = Math.atan2(heading.y, heading.x) - Math.PI/2;
 
+                        let m = Mat3.Translation2D(cursorPosition)
+                        .times(Mat3.Rotation(angle))
+                        .times(Mat3.Scale2D(3));
+                    
+                        if (this.labCatModel.transform == Mat3.Translation2D(V2(100,100))) {
+                            this.labCatModel.visible = false;
+                        }
                         this.labCatModel.setTransform(
-                            // Mat3.Scale2D(3).times(Mat3.Translation2D(cursorPosition))
-                            // Mat3.Translation2D(cursorPosition).times(Mat3.Scale2D(3))
-                            Mat3.Translation2D(cursorPosition)
-                                .times(Mat3.Rotation(angle))
-                                .times(Mat3.Scale2D(3))
-                        )
+                            m
+                        );
+
+                        // Change the z value of the labCatModel to be -1
+                        // this.labCatModel.
                     }
                 },
                 onDragStart:(event:AInteractionEvent, interaction:ADragInteraction)=>{
