@@ -73,11 +73,11 @@ export class MainSceneModel extends App2DSceneModel{
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
         this.obstacles_basic();
-        this.basicTrussMesh();
         this.subscribe(appState.addStateValueListener("ColorValue1", (newValue)=>{
             for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
             for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
         }), "ColorSubscription")
+        this.basicMesh();
     }
 
 
@@ -148,50 +148,15 @@ export class MainSceneModel extends App2DSceneModel{
         let spring = new SpringModel();
         spring.setMaterial(this.polygonMaterial);
 
-        let points: Vec2[] = [
-            new Vec2(-2,2),
-            new Vec2(-1,2),
-            new Vec2(0,2),
-            new Vec2(1,2),
-            new Vec2(-2,1),
-            new Vec2(-1,1),
-            new Vec2(0,1),
-            new Vec2(1,1),
-            new Vec2(-2,0),
-            new Vec2(-1,0),
-            new Vec2(0,0),
-            new Vec2(1,0),
-            new Vec2(-2,-1),
-            new Vec2(-1,-1),
-            new Vec2(0,-1),
-            new Vec2(1,-1),
-            new Vec2(-2,-2),
-            new Vec2(-1,-2),
-            new Vec2(0,-2),
-            new Vec2(1,-2),
-            new Vec2(-2,-3),
-            new Vec2(-1,-3),
-            new Vec2(0,-3),
-            new Vec2(1,-3)
-        ];
-
+        let top_left = new Vec2(-4, 8);
+        let gSz = 0.6;
+        let points: Vec2[] = [];
         
-        // Shift all points up by adding the translation vector
-        let translation = new Vec2(0, 10);
-        for (let i = 0; i < points.length; i++) {
-            points[i] = points[i].add(translation);
-        }
-
-        for (let i = 0; i < points.length; i++) {
-            spring.addJoint(points[i], this.polygonMaterial, this);
-        }
-
-        // Function to calculate the Euclidean distance between two points
-        function calculateDistance(p1:Vec2, p2:Vec2) {
-            return Math.sqrt(p1.add(p2.times(-1)).dot(p1.add(p2.times(-1))));
-        }
-
-        // Add edges based on a grid layout
+        for (let i = 0; i <= 23; i++) points.push(top_left.add(new Vec2(i % 4 * gSz, Math.floor(i / 4) * gSz)));
+        for (let i = 0; i < points.length; i++) spring.addJoint(points[i], this.polygonMaterial, this);
+        
+        function calculateDistance(p1:Vec2, p2:Vec2) { return Math.sqrt(p1.minus(p2).dot(p1.minus(p2))); }
+        
         for (let i = 0; i <= 23; i++) {
             if ((i + 1) % 4 !== 0) { // Horizontal edges within the same row
                 spring.addEdge(i, i + 1, calculateDistance(points[i], points[i + 1]));
@@ -207,8 +172,12 @@ export class MainSceneModel extends App2DSceneModel{
             }
         }
 
-
-        spring.setPolys([this.myRect2.verts, this.myRect.verts, this.myRect3.verts, this.myRect4.verts, this.myTriangle.verts]);
+        spring.setPolys([
+            this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
+            this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
+            this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
+            this.myTriangle.verts.GetTransformedBy(this.myTriangle.transform as Mat3)
+        ]);
         this.addChild(spring);
         this.springs.push(spring);
     }
@@ -240,7 +209,13 @@ export class MainSceneModel extends App2DSceneModel{
         spring.addEdge(1,3,Math.sqrt(p1.add(p3.times(-1)).dot(p1.add(p3.times(-1)))));
         spring.addEdge(2,3,Math.sqrt(p2.add(p3.times(-1)).dot(p2.add(p3.times(-1)))));
 
-        spring.setPolys([this.myRect2.verts, this.myRect.verts, this.myRect3.verts, this.myRect4.verts, this.myTriangle.verts]);
+        spring.setPolys([
+            this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
+            this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
+            this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
+            this.myTriangle.verts.GetTransformedBy(this.myTriangle.transform as Mat3)
+        ]);
+
         this.addChild(spring);
         this.springs.push(spring);
 
@@ -275,6 +250,7 @@ export class MainSceneModel extends App2DSceneModel{
         this.myTriangle.verts.addVertex(new Vec2(-6, -5), Color.FromString("#aaaaaa"));
         this.myTriangle.verts.addVertex(new Vec2(-2, -5), Color.FromString("#aaaaaa"));
         this.myTriangle.verts.addVertex(new Vec2(-4, -1), Color.FromString("#aaaaaa"));
+        this.myTriangle.setTransform(Mat3.Translation2D(new Vec2(2.5, -.2)));
         this.addChild(this.myTriangle);
 
         this.myRect = new Polygon2DModel();
@@ -300,7 +276,7 @@ export class MainSceneModel extends App2DSceneModel{
         this.myRect3.verts.addVertex(new Vec2(0, 1), Color.FromString("#aaaaaa"));
         this.myRect3.verts.addVertex(new Vec2(8, 1), Color.FromString("#aaaaaa"));
         this.myRect3.verts.addVertex(new Vec2(8, 0), Color.FromString("#aaaaaa"));
-        this.myRect3.setTransform(Mat3.Rotation(-Math.PI/4).times(Mat3.Translation2D(new Vec2(-11, 1))));
+        this.myRect3.setTransform(Mat3.Rotation(-Math.PI/4).times(Mat3.Translation2D(new Vec2(-10, 1))));
         this.addChild(this.myRect3);
     }
 
@@ -352,6 +328,15 @@ export class MainSceneModel extends App2DSceneModel{
 
     timeUpdate(t: number) {
         try {
+            // this.myRect2.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(Math.PI/4)));
+            // this.myRect3.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(-Math.PI/4)));
+
+            // this.springs[0].setPolys([
+            //     this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
+            //     this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
+            //     this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
+            //     this.myRect4.verts.GetTransformedBy(this.myRect4.transform as Mat3)
+            // ])
             for (let spline of this.splines) spline.timeUpdate(t);
             for (let spring of this.springs) spring.timeUpdate(t);
             //for (let joint of this.joints) joint.setUniformColor(this.color);
