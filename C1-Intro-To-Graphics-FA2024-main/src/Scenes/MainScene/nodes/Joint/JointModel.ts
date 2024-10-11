@@ -16,6 +16,7 @@ export class JointModel extends ANodeModel2D{
     _lt: number = 0;
     _force: Vec2 = new Vec2(0, 0);
     _polys: VertexArray2D[] = [];
+    _selected: boolean = false;
 
     set zValue(value) {
         this._zValue = value;
@@ -42,7 +43,7 @@ export class JointModel extends ANodeModel2D{
             verts??Polygon2D.CreateForRendering(true, true, false)
         )
 
-        let pnts = Polygon2D.CircleVArray(0.25, 15);
+        let pnts = Polygon2D.CircleVArray(0.15, 15);
         for (let i = 0; i < pnts.nVerts; i++)
             this.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
 
@@ -97,6 +98,12 @@ export class JointModel extends ANodeModel2D{
 
     applyForce(force: Vec2){
         this._force.addInPlace(force);
+    }
+
+    setSelected(selected: boolean) {
+        this._selected = selected;
+        this._force = new Vec2(0, 0);
+        this._velocity = new Vec2(0, 0);
     }
 
     findClosestIntersection(x1 : number, y1 : number, x2 : number, y2 : number, a : number, b : number) {
@@ -186,7 +193,7 @@ export class JointModel extends ANodeModel2D{
         for (let joint of joints){
             if (joint == this) continue;
             let distance = this._position.minus(joint._position).dot(this._position.minus(joint._position));
-            let r = 0.5;
+            let r = 0.1;
             if (distance < r){
                 let og_pos = this._position.clone();
                 let new_pos = joint._position.clone();
@@ -204,6 +211,7 @@ export class JointModel extends ANodeModel2D{
 
 
     timeUpdate(t: number, ...args: any[]): void {
+        if (this._selected) return;
         let joints = args[0];
 
         const G = 0.005;
@@ -226,6 +234,7 @@ export class JointModel extends ANodeModel2D{
         // Update position on screen or environment
         this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
         // set max velocity
+        // let maxVel = Infinity;
         let maxVel = 0.05;
         if (this._velocity.dot(this._velocity) > maxVel * maxVel) {
             this._velocity.normalize();

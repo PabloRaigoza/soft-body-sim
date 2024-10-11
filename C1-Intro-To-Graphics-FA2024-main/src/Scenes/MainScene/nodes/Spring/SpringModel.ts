@@ -25,6 +25,7 @@ export class SpringModel extends ANodeModel2D {
     stiffness: number = 0.3;
     edges: Vec3[] = [];
     _polys: VertexArray2D[] = [];
+    selected_joint: number = -1;
 
     @AObjectState change : boolean = false;
     joints: JointModel[] = [];
@@ -57,6 +58,39 @@ export class SpringModel extends ANodeModel2D {
     setPolys(polys: VertexArray2D[]) {
         this._polys = polys;
         for (let joint of this.joints) joint.setPolys(polys);
+    }
+
+    dragStart(point : Vec2) {
+        // Find closest joint
+        let closestJoint = this.joints[0];
+        let closestDistance = Infinity;
+        for (let joint of this.joints) {
+            let distance = joint.position.minus(point).dot(joint.position.minus(point));
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestJoint = joint;
+            }
+        }
+
+        if (closestDistance < 0.5) {
+            closestJoint.setSelected(true);
+            this.selected_joint = this.joints.indexOf(closestJoint);
+        }
+    }
+
+    dragging(point : Vec2) {
+        if (this.selected_joint != -1) {
+            this.joints[this.selected_joint].setPos(point);
+        }
+    }
+
+    dragEnd() {
+        if (this.selected_joint != -1) {
+            this.joints[this.selected_joint].setSelected(false);
+            // this.joints[this.selected_joint]._velocity = new Vec2(0, 0);
+            this.selected_joint = -1;
+            for (let joint of this.joints) joint._velocity = new Vec2(0, 0);
+        }
     }
 
     timeUpdate(t: number, ...args: any[]): void {

@@ -36,6 +36,10 @@ export class MainSceneController extends App2DSceneController{
         return this.model.currentSpline;
     }
 
+    get springModel() {
+        return this.model.springs[0];
+    }
+
 
     /**
      * The main customization you might do here would be to set the background color or set a background image.
@@ -167,7 +171,8 @@ export class MainSceneController extends App2DSceneController{
             "MainInteractionMode",
             this,
             {
-                onKeyDown: (event:AInteractionEvent, interaction:AKeyboardInteraction)=>{},
+                onKeyDown: (event:AInteractionEvent, interaction:AKeyboardInteraction)=>{
+                },
                 onKeyUp:(event:AInteractionEvent, interaction:AKeyboardInteraction)=>{
                     if(event.key==='t'){
                         this.model.addNewSpline()
@@ -187,48 +192,70 @@ export class MainSceneController extends App2DSceneController{
                     }
                 },
                 onDragStart:(event:AInteractionEvent, interaction:ADragInteraction)=>{
+                    // let ndcCursor = event.ndcCursor;
+                    // if(ndcCursor) {
+                    //     let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                    //     interaction.cursorStartPosition = cursorPosition;
+                    //     if(self.splineModel.nControlPoints<1){
+                    //         self.splineModel.verts.addVertices(
+                    //             [
+                    //                 cursorPosition,
+                    //                 cursorPosition,
+                    //             ],
+                    //             Color.White()
+                    //         )
+                    //     }else {
+                    //         self.splineModel.verts.addVertices(
+                    //             [
+                    //                 cursorPosition,
+                    //                 cursorPosition,
+                    //                 cursorPosition,
+                    //             ],
+                    //             Color.White()
+                    //         )
+                    //     }
+                    //     // this.newVertsColor = Color.RandomRGB();
+                    //     this.splineModel.signalGeometryUpdate();
+                    // }
                     let ndcCursor = event.ndcCursor;
-                    if(ndcCursor) {
+                    if (ndcCursor) {
                         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                        interaction.cursorStartPosition = cursorPosition;
-                        if(self.splineModel.nControlPoints<1){
-                            self.splineModel.verts.addVertices(
-                                [
-                                    cursorPosition,
-                                    cursorPosition,
-                                ],
-                                Color.White()
-                            )
-                        }else {
-                            self.splineModel.verts.addVertices(
-                                [
-                                    cursorPosition,
-                                    cursorPosition,
-                                    cursorPosition,
-                                ],
-                                Color.White()
-                            )
-                        }
-                        // this.newVertsColor = Color.RandomRGB();
-                        this.splineModel.signalGeometryUpdate();
+                        this.springModel.dragStart(cursorPosition);
+                        this.springModel.signalGeometryUpdate();
                     }
+                    console.log('key down');
                 },
-                // onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                //     let ndcCursor = event.ndcCursor;
-                //     if(ndcCursor) {
-                //         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                //         let startPosition = interaction.cursorStartPosition;
-                //         if (this.splineModel.nControlPoints > 3) {
-                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 2, startPosition);
-                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
-                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 3, startPosition.minus(cursorPosition.minus(startPosition)));
-                //         }else{
-                //             this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
-                //         }
-                //         this.splineModel.signalGeometryUpdate();
-                //     }
-                // },
-                onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{},
+                onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
+                    // let ndcCursor = event.ndcCursor;
+                    // if(ndcCursor) {
+                    //     let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                    //     let startPosition = interaction.cursorStartPosition;
+                    //     if (this.splineModel.nControlPoints > 3) {
+                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 2, startPosition);
+                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
+                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 3, startPosition.minus(cursorPosition.minus(startPosition)));
+                    //     }else{
+                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
+                    //     }
+                    //     this.splineModel.signalGeometryUpdate();
+                    // }
+                    let ndcCursor = event.ndcCursor;
+                    if (ndcCursor) {
+                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                        this.springModel.dragging(cursorPosition);
+                        this.springModel.signalGeometryUpdate();
+                    }
+                    console.log('key drag');
+                },
+                onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{
+                    let ndcCursor = event.ndcCursor;
+                    if (ndcCursor) {
+                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                        this.springModel.dragEnd();
+                        this.springModel.signalGeometryUpdate();
+                    }
+                    console.log('key drag');
+                },
                 // onClick:(event:AInteractionEvent)=>{},
                 // afterActivate:(...args:any[])=>{},
                 // afterDeactivate:(...args:any[])=>{},
