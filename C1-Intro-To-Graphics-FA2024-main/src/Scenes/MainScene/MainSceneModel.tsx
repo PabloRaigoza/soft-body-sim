@@ -184,11 +184,16 @@ export class MainSceneModel extends App2DSceneModel{
         else if (meshOption == "mesh") this.complexMesh();
         else if (meshOption == "truss") this.basicTrussMesh();
         else if (meshOption == "circular") this.circularMesh();
+
+
+        this.springs[0].setColor(GetAppState().getState("SpringColor"));
+        this.springs[0].setJointColor(GetAppState().getState("JointColor"));
         
         this.labCatVectorHead = new CustomSVGModel(this.labCatSVG);
         this.labCatVectorHead.setTransform(
             Mat3.Translation2D(new Vec2(100, 100))
         )
+        this.labCatVectorHead.zValue = 10;
         // this.labCatVectorHead.visible = false;
         // this.labCatVectorHead.zValue = 10;
         this.addChild(this.labCatVectorHead);

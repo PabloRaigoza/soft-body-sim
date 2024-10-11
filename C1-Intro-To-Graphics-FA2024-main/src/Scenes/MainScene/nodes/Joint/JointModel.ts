@@ -238,6 +238,15 @@ export class JointModel extends ANodeModel2D{
 
     prevVelocity: Vec2 = new Vec2(0, 0);
     timeUpdate(t: number, ...args: any[]): void {
+        // let newVerts = this.verts.color.setElements([this._color.r, this._color.g, this._color.b, this._color.a]);
+        // this.setVerts(newVerts);
+
+        let newVerts = new VertexArray2D();
+        newVerts.initColorAttribute();
+        for (let i = 0; i < this.verts.nVerts; i++)
+            newVerts.addVertex(this.verts.vertexAt(i), this._color);
+        this.setVerts(newVerts);
+        
         if (this._selected) return;
         let joints = args[0];
         this._mass = 2;
@@ -254,7 +263,6 @@ export class JointModel extends ANodeModel2D{
         //     F.normalize();
         //     F = F.times(maxForce);
         // }
-        this._velocity = this._velocity.plus(F.times(this._dt / this._mass));  // Update velocity using force
         
         // let maxVel = 0.5;
         // let maxVelDiff = 2;
@@ -269,9 +277,10 @@ export class JointModel extends ANodeModel2D{
         // }
 
         // if (this._velocity.dot(this._velocity) > maxVel * maxVel) {
-        //     this._velocity.normalize();
+            //     this._velocity.normalize();
         //     this._velocity = this._velocity.times(maxVel);
         // }
+        this._velocity = this._velocity.plus(F.times(this._dt / this._mass));  // Update velocity using force
         this._position = this._position.plus(this._velocity.times(this._dt));  // Update position
         this.setPos(this._position);
 

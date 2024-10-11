@@ -254,7 +254,7 @@ export class MainSceneController extends App2DSceneController{
                         .times(Mat3.Rotation(angle))
                         .times(Mat3.Scale2D(3));
                     
-                        if (this.labCatModel.transform == Mat3.Translation2D(V2(100,100))) {
+                        if (this.labCatModel.zValue == 10) {
                             this.labCatModel.visible = false;
                         }
                         this.labCatModel.setTransform(
@@ -275,6 +275,7 @@ export class MainSceneController extends App2DSceneController{
                             let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
                             this.springModel.cursorImpulse(cursorPosition.clone());
                             this.labCatModel.visible = true;
+                            this.labCatModel.zValue = 0;
                         }
 
                     }

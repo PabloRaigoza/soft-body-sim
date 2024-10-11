@@ -102,6 +102,10 @@ export class SpringModel extends ANodeModel2D {
         }
     }
 
+    setJointColor(color: Color) {
+        for (let joint of this.joints) joint._color = color;
+    }
+
     dragEnd() {
         if (this.selected_joint != -1) {
             this.joints[this.selected_joint].setSelected(false);
@@ -150,6 +154,9 @@ export class SpringModel extends ANodeModel2D {
             let F_d = F_d1.dot(vA.add(vB.times(-1))) * this.damping;
             let diff = B.add(A.times(-1));
             let F_s = (Math.sqrt(diff.dot(diff)) - l) * this.stiffness;
+
+            // let a = (Math.sqrt(B.minus(A).dot(B.minus(A))) - l) * this.stiffness;
+
             let F = F_d + F_s;
             this.joints[i].applyForce(F_d1.times(F));
             this.joints[j].applyForce(F_d1.times(-F));
