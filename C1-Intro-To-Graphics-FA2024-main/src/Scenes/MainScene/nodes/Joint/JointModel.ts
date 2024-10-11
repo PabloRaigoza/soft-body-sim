@@ -17,7 +17,7 @@ export class JointModel extends ANodeModel2D{
     _polys: VertexArray2D[] = [];
     _color: Color = Color.FromRGBA(1, 0, 0, 1);
     _selected: boolean = false;
-    _radius: number = 0.01;
+    _radius: number = 0.1;
     _G: number = 0.01;
     _dt: number = 1;
 

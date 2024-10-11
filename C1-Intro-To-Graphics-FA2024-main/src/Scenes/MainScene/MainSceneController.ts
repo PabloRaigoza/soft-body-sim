@@ -65,67 +65,83 @@ export class MainSceneController extends App2DSceneController{
         //     console.log(self)
         // })
 
-        var normal_mesh_options = {
-            1: "triangle",
-            2: "cloth"
+        var soft_body = {
+            1: "simple",
+            2: "mesh",
+            3: "truss",
+            4: "circular"
         }
 
-        let normal_options = Object.values(normal_mesh_options);
+        let soft_body_options = Object.values(soft_body);
         appState.setGUIControlSpecKey(
-            "NormalMesh",
+            "SoftBodyOptions",
             {
-                options: normal_mesh_options,
-                value: normal_mesh_options[1],
+                options: soft_body_options,
+                value: soft_body_options[0],
                 onChange:(selected:any)=>{
-                    switch (selected){
-                        case normal_mesh_options[1]:
-                            console.log(normal_mesh_options[1])
-                            break;
-                        case normal_mesh_options[2]:
-                            console.log(normal_mesh_options[2])
-                            break;
-                        default:
-                            console.warn(`unknown option "${selected}"!`);
-                            break;
+                    // switch (selected){
+                    //     case soft_body_options[1]:
+                    //         this.model.createScenesAndMeshes("simple", this.model.current_scene);
+                    //         break;
+                    //     case soft_body_options[2]:
+                    //         this.model.createScenesAndMeshes("complex", this.model.current_scene);
+                    //         break;
+                    //     case soft_body_options[3]:
+                    //         this.model.createScenesAndMeshes("truss", this.model.current_scene);
+                    //         break;
+                    //     case soft_body_options[4]:
+                    //         this.model.createScenesAndMeshes("circular", this.model.current_scene);
+                    // }
+                    if (selected === soft_body_options[0]){
+                        this.model.createScenesAndMeshes("simple", this.model.current_scene);
+                    }
+                    if (selected === soft_body_options[1]){
+                        this.model.createScenesAndMeshes("mesh", this.model.current_scene);
+                    }
+                    if (selected === soft_body_options[2]){
+                        this.model.createScenesAndMeshes("truss", this.model.current_scene);
+                    }
+                    if (selected === soft_body_options[3]){
+                        this.model.createScenesAndMeshes("circular", this.model.current_scene);
                     }
                 }
             }
         )
-        var pressure_mesh_options = {
-            1 : "triangle",
-            2 : "circle"
+        var scenes = {
+            1 : "basic",
+            2 : "dynamic",
+            3 : "slant"
         }
-        let pressure_options = Object.values(pressure_mesh_options);
+        let scene_options = Object.values(scenes);
         appState.setGUIControlSpecKey(
-            "PressureMesh",
+            "SceneOptions",
             {
-                options: pressure_mesh_options,
-                value: pressure_mesh_options[1],
+                options: scene_options,
+                value: scene_options[0],
                 onChange:(selected:any)=>{
-                    switch (selected){
-                        case pressure_mesh_options[1]:
-                            console.log(pressure_mesh_options[1])
-                            break;
-                        case pressure_mesh_options[2]:
-                            console.log(pressure_mesh_options[2])
-                            break;
-                        default:
-                            console.warn(`unknown option "${selected}"!`);
-                            break;
+                    // switch (selected){
+                    //     case scene_options[1]:
+                    //         this.model.createScenesAndMeshes(this.model.current_mesh, "basic");
+                    //         break;
+                    //     case scene_options[2]:
+                    //         this.model.createScenesAndMeshes(this.model.current_mesh, "dynamic");
+                    //         break;
+                    //     case scene_options[3]:
+                    //         this.model.createScenesAndMeshes(this.model.current_mesh, "cross");
+                    //         break;
+                    // }
+                    if (selected === scene_options[0]){
+                        this.model.createScenesAndMeshes(this.model.current_mesh, "basic");
+                    }
+                    if (selected === scene_options[1]){
+                        this.model.createScenesAndMeshes(this.model.current_mesh, "dynamic");
+                    }
+                    if (selected === scene_options[2]){
+                        this.model.createScenesAndMeshes(this.model.current_mesh, "cross");
                     }
                 }
             }
         )
-        appState.setGUIControlSpecKey(
-            "Pressure",
-            {
-                value: false,
-                onChange:(value:any)=>{
-                    console.log(value);
-                }
-            }
-        )
-
     }
 
 
