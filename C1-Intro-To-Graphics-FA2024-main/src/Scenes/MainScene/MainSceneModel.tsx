@@ -10,20 +10,11 @@ import { Polygon2DModel } from "anigraph/starter/nodes/polygon2D";
 
 let nErrors = 0;
 
-enum AppStateKeys{
-    joint_mass="JointMass",
-    joint_damping="JointDamping",
-    spring_stiffness="SpringStiffness",
-    joint_color="JointColor",
-    spring_color="SpringColor"
-}
-
 /**
  * This is your Scene Model class. The scene model is the main data model for your application. It is the root for a
  * hierarchy of models that make up your scene/
  */
 export class MainSceneModel extends App2DSceneModel{
-    static AppStateKeys=AppStateKeys;
     _splines:SplineModel[] = [];
     color:Color = Color.FromRGBA([1, 0, 0, 1]);
 
@@ -45,7 +36,9 @@ export class MainSceneModel extends App2DSceneModel{
         appState.addSliderIfMissing("SpringStiffness", 0.3, 0.01, 0.5, 0.01);
         appState.addSliderIfMissing("JointRadius", 0.1, 0, 0.3, 0.01);
         appState.addColorControl("SpringColor", Color.FromRGBA([1, 1, 1, 1]));
-
+        appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.01, 0.0005);
+        appState.addSliderIfMissing("Dt", 1, 0, 1, 0.1);
+        appState.addSliderIfMissing("ImpulseScale", 0.1, -0.25, 0.25, 0.01);
     }
 
     /**
@@ -93,6 +86,17 @@ export class MainSceneModel extends App2DSceneModel{
         this.subscribe(appState.addStateValueListener("SpringColor", (newValue)=>{
             this.springs[0].setColor(newValue); 
         }), "SpringColorSubscription")
+        this.subscribe(appState.addStateValueListener("Gravity", (newValue)=>{
+            for (let joint of this.springs[0].joints) joint.setGravity(newValue);
+            for (let joint of this.springs[0].joints) joint.signalGeometryUpdate();
+        }), "GravitySubscription")
+        this.subscribe(appState.addStateValueListener("Dt", (newValue)=>{
+            for (let joint of this.springs[0].joints) joint.setDt(newValue);
+            for (let joint of this.springs[0].joints) joint.signalGeometryUpdate();
+        }), "DtSubscription")
+        this.subscribe(appState.addStateValueListener("ImpulseScale", (newValue)=>{
+            this.springs[0].setImpulse(newValue);
+        }), "ImpulseSubscription")
     }
 
     createScenesAndMeshes(meshOption: string, sceneOption: string) {
@@ -232,6 +236,78 @@ export class MainSceneModel extends App2DSceneModel{
         this.springs.push(spring);
 
     }
+    circularMesh() {
+        let spring = new SpringModel();
+        spring.setMaterial(this.polygonMaterial);
+    
+        let center = new Vec2(0, 0);
+        let innerRadius = 0.5;  // Inner circle radius
+        let outerRadius = 2.0;  // Outer circle radius
+        let numInnerPoints = 8; // Number of points in the inner circle
+        let numOuterPoints = 16; // Number of points in the outer circle
+        let innerPoints: Vec2[] = [];
+        let outerPoints: Vec2[] = [];
+        
+        // Generate points for the inner circle
+        for (let i = 0; i < numInnerPoints; i++) {
+            let angle = (i / numInnerPoints) * 2 * Math.PI;
+            let x = innerRadius * Math.cos(angle);
+            let y = innerRadius * Math.sin(angle);
+            innerPoints.push(new Vec2(x, y));
+        }
+    
+        // Generate points for the outer circle
+        for (let i = 0; i < numOuterPoints; i++) {
+            let angle = (i / numOuterPoints) * 2 * Math.PI;
+            let x = outerRadius * Math.cos(angle);
+            let y = outerRadius * Math.sin(angle);
+            outerPoints.push(new Vec2(x, y));
+        }
+    
+        // Add inner and outer points as joints in the spring model
+        for (let point of innerPoints) {
+            spring.addJoint(point, this.polygonMaterial, this);
+        }
+        for (let point of outerPoints) {
+            spring.addJoint(point, this.polygonMaterial, this);
+        }
+    
+        // Function to calculate the Euclidean distance between two points
+        function calculateDistance(p1: Vec2, p2: Vec2) {
+            return Math.sqrt(p1.minus(p2).dot(p1.minus(p2)));
+        }
+    
+        // Add edges for inner circle (connect neighboring points)
+        for (let i = 0; i < numInnerPoints; i++) {
+            let nextIndex = (i + 1) % numInnerPoints;
+            spring.addEdge(i, nextIndex, calculateDistance(innerPoints[i], innerPoints[nextIndex]));
+        }
+    
+        // Add edges for outer circle (connect neighboring points)
+        for (let i = 0; i < numOuterPoints; i++) {
+            let nextIndex = (i + 1) % numOuterPoints;
+            spring.addEdge(numInnerPoints + i, numInnerPoints + nextIndex, calculateDistance(outerPoints[i], outerPoints[nextIndex]));
+        }
+    
+        // Add edges connecting inner and outer circles (triangular connections)
+        for (let i = 0; i < numInnerPoints; i++) {
+            let correspondingOuterIndex1 = Math.floor(i * (numOuterPoints / numInnerPoints));
+            let correspondingOuterIndex2 = (correspondingOuterIndex1 + 1) % numOuterPoints;
+    
+            // Connect inner point to two outer points to form triangles
+            spring.addEdge(i, numInnerPoints + correspondingOuterIndex1, calculateDistance(innerPoints[i], outerPoints[correspondingOuterIndex1]));
+            spring.addEdge(i, numInnerPoints + correspondingOuterIndex2, calculateDistance(innerPoints[i], outerPoints[correspondingOuterIndex2]));
+        }
+        spring.setPolys([
+            this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
+            this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
+            this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
+            this.myTriangle.verts.GetTransformedBy(this.myTriangle.transform as Mat3)
+        ]);
+    
+        this.addChild(spring);
+        this.springs.push(spring);
+    }        
 
     obstacles_cross() {
         let myRect = new Polygon2DModel();

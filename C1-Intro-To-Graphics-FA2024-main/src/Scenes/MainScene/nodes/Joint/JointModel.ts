@@ -6,7 +6,6 @@ import {ASerializable} from "../../../../anigraph/base";
 import {BoundingBox2D, HasBounds2D, LineSegment, Polygon2D, VertexArray, VertexArray2D} from "../../../../anigraph/geometry";
 import {Color, Mat3, Transformation2DInterface, Vec2} from "../../../../anigraph/math";
 
-let G = 1;
 @ASerializable("JointModel")
 export class JointModel extends ANodeModel2D{
     _zValue: number = 0;
@@ -19,6 +18,8 @@ export class JointModel extends ANodeModel2D{
     _color: Color = Color.FromRGBA(1, 0, 0, 1);
     _selected: boolean = false;
     _radius: number = 0.01;
+    _G: number = 0.01;
+    _dt: number = 1;
 
     set zValue(value) {
         this._zValue = value;
@@ -72,6 +73,14 @@ export class JointModel extends ANodeModel2D{
     
     setJointRadius(radius: number){
         this._radius = radius;
+    }
+
+    setGravity(g: number){
+        this._G = g;
+    }
+
+    setDt(dt: number){
+        this._dt = dt;
     }
 
     reradius(){
@@ -232,12 +241,8 @@ export class JointModel extends ANodeModel2D{
         if (this._selected) return;
         let joints = args[0];
         this._mass = 2;
-
-        const G = 0.01;
         let F = this._force;
-        let dt = t - this._lt;  // Delta time for the current frame
-        dt = 1;
-        F.y += -G;
+        F.y += -this._G;
 
         // if(this.environmentCollision()) F.y = 0;
         this.environmentCollision();
@@ -249,7 +254,7 @@ export class JointModel extends ANodeModel2D{
         //     F.normalize();
         //     F = F.times(maxForce);
         // }
-        this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
+        this._velocity = this._velocity.plus(F.times(this._dt / this._mass));  // Update velocity using force
         
         // let maxVel = 0.5;
         // let maxVelDiff = 2;
@@ -267,7 +272,7 @@ export class JointModel extends ANodeModel2D{
         //     this._velocity.normalize();
         //     this._velocity = this._velocity.times(maxVel);
         // }
-        this._position = this._position.plus(this._velocity.times(dt));  // Update position
+        this._position = this._position.plus(this._velocity.times(this._dt));  // Update position
         this.setPos(this._position);
 
         this._force = new Vec2(0, 0);

@@ -24,6 +24,7 @@ export class SpringModel extends ANodeModel2D {
     lineWidth: number = 0.003;
     damping: number = 0.00;
     stiffness: number = 0.3;
+    _impulse: number = 0.1;
     color: Color = Color.FromRGBA(1, 1, 1, 1);
     edges: Vec3[] = [];
     _polys: VertexArray2D[] = [];
@@ -67,7 +68,10 @@ export class SpringModel extends ANodeModel2D {
     }
     setColor(color: Color) {
         this.color = color;
-        console.log(this.color);
+        this.signalGeometryUpdate();
+    }
+    setImpulse(impulse: number) {
+        this._impulse = impulse;
         this.signalGeometryUpdate();
     }
     dragStart(point : Vec2) {
@@ -115,7 +119,7 @@ export class SpringModel extends ANodeModel2D {
             for (let joint of this.joints) {
                 let normal = joint.position.minus(cursor);
                 normal.normalize();
-                joint.applyForce(normal.times(0.1));
+                joint.applyForce(normal.times(this._impulse));
             }
         }
         this.cursorImpulses = [];
@@ -124,7 +128,7 @@ export class SpringModel extends ANodeModel2D {
             for (let joint of this.joints) {
                 let normal = keyImpulse;
                 normal.normalize();
-                joint.applyForce(normal.times(0.1));
+                joint.applyForce(normal.times(this._impulse));
             }
         }
         this.keyImpulses = [];
