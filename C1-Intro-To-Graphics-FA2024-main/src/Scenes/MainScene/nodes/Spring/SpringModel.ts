@@ -16,6 +16,7 @@ import {
 import { JointModel } from "../Joint/JointModel";
 import { VertexArray } from "../../../../anigraph/geometry";
 import { MainSceneModel } from "Scenes/MainScene/MainSceneModel";
+import { time } from "console";
 
 
 @ASerializable("SpringModel")
@@ -23,6 +24,7 @@ export class SpringModel extends ANodeModel2D {
     lineWidth: number = 0.003;
     damping: number = 0.00;
     stiffness: number = 0.3;
+    color: Color = Color.FromRGBA(1, 1, 1, 1);
     edges: Vec3[] = [];
     _polys: VertexArray2D[] = [];
     selected_joint: number = -1;
@@ -59,7 +61,15 @@ export class SpringModel extends ANodeModel2D {
         this._polys = polys;
         for (let joint of this.joints) joint.setPolys(polys);
     }
-
+    setStiff(stiff: number) {
+        this.stiffness = stiff;
+        this.signalGeometryUpdate();
+    }
+    setColor(color: Color) {
+        this.color = color;
+        console.log(this.color);
+        this.signalGeometryUpdate();
+    }
     dragStart(point : Vec2) {
         // Find closest joint
         let closestJoint = this.joints[0];
@@ -196,8 +206,8 @@ export class SpringModel extends ANodeModel2D {
         for (let edge of this.edges) {
             let i = edge.x;
             let j = edge.y;
-            newVerts.addVertex(this.joints[i].position, Color.White());
-            newVerts.addVertex(this.joints[j].position, Color.White());
+            newVerts.addVertex(this.joints[i].position, this.color);
+            newVerts.addVertex(this.joints[j].position, this.color);
         }
 
         this.change = !this.change;

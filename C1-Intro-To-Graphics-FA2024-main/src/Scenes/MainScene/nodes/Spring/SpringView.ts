@@ -28,8 +28,8 @@ export class SpringView extends ANodeView {
             // controlShape.init(this.model.edges[edge].clone().FillColor(Color.FromString("#00aa00")), this.model.getFrameMaterial());
             let newVerts = new VertexArray2D();
             newVerts.initColorAttribute();
-            newVerts.addVertex(this.model.joints[this.model.edges[edge].x].position, Color.White());
-            newVerts.addVertex(this.model.joints[this.model.edges[edge].y].position, Color.White());
+            newVerts.addVertex(this.model.joints[this.model.edges[edge].x].position, this.model.color);
+            newVerts.addVertex(this.model.joints[this.model.edges[edge].y].position, this.model.color);
             controlShape.init(newVerts, this.model.getFrameMaterial());
             controlShape.setLineWidth(this.model.lineWidth);
             controlShape.visible = true;
@@ -57,8 +57,8 @@ export class SpringView extends ANodeView {
             controlShape.visible = true;
             let newVerts = new VertexArray2D();
             newVerts.initColorAttribute();
-            newVerts.addVertex(this.model.joints[this.model.edges[edge].x].position, Color.White());
-            newVerts.addVertex(this.model.joints[this.model.edges[edge].y].position, Color.White());
+            newVerts.addVertex(this.model.joints[this.model.edges[edge].x].position, this.model.color);
+            newVerts.addVertex(this.model.joints[this.model.edges[edge].y].position, this.model.color);
             controlShape.setVerts2D(newVerts);
             controlShape.setLineWidth(this.model.lineWidth);
             i++;

@@ -13,8 +13,9 @@ let nErrors = 0;
 enum AppStateKeys{
     joint_mass="JointMass",
     joint_damping="JointDamping",
-    joint_stiffness="JointStiffness",
+    spring_stiffness="SpringStiffness",
     joint_color="JointColor",
+    spring_color="SpringColor"
 }
 
 /**
@@ -24,7 +25,7 @@ enum AppStateKeys{
 export class MainSceneModel extends App2DSceneModel{
     static AppStateKeys=AppStateKeys;
     _splines:SplineModel[] = [];
-    color:Color = Color.FromString("#aaaaaa");
+    color:Color = Color.FromRGBA([1, 0, 0, 1]);
 
     get splines():SplineModel[]{
         return this._splines;
@@ -40,7 +41,11 @@ export class MainSceneModel extends App2DSceneModel{
      */
     initAppState(appState:AppState){
         //appState.addSliderIfMissing("SliderValue1", 0, 0, 1, 0.001);
-        appState.addColorControl("JointColor", Color.FromString("#aaaaaa"));
+        appState.addColorControl("JointColor", Color.FromRGBA([1, 0, 0, 1]));
+        appState.addSliderIfMissing("SpringStiffness", 0.3, 0.01, 0.5, 0.01);
+        appState.addSliderIfMissing("JointRadius", 0.1, 0, 0.3, 0.01);
+        appState.addColorControl("SpringColor", Color.FromRGBA([1, 1, 1, 1]));
+
     }
 
     /**
@@ -74,6 +79,20 @@ export class MainSceneModel extends App2DSceneModel{
         // this.obstacles_dynamic();
         // this.basicMesh();
         this.complexMesh();
+        this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
+            for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
+            for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
+        }), "JointColorSubscription")
+        this.subscribe(appState.addStateValueListener("SpringStiffness", (newValue)=>{
+            this.springs[0].setStiff(newValue);
+        }), "StiffnessSubscription")
+        this.subscribe(appState.addStateValueListener("JointRadius", (newValue)=>{ 
+            for (let joint of this.springs[0].joints) joint.setJointRadius(newValue);
+            for (let joint of this.springs[0].joints) joint.reradius();
+        }), "RadiusSubscription")
+        this.subscribe(appState.addStateValueListener("SpringColor", (newValue)=>{
+            this.springs[0].setColor(newValue); 
+        }), "SpringColorSubscription")
     }
 
 
@@ -333,7 +352,6 @@ export class MainSceneModel extends App2DSceneModel{
             //     this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
             //     this.myRect4.verts.GetTransformedBy(this.myRect4.transform as Mat3)
             // ])
-            for (let spline of this.splines) spline.timeUpdate(t);
             for (let spring of this.springs) spring.timeUpdate(t);
             //for (let joint of this.joints) joint.setUniformColor(this.color);
             //this.myRect2.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(Math.PI/4)));

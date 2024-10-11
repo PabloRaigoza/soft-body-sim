@@ -18,6 +18,7 @@ export class JointModel extends ANodeModel2D{
     _polys: VertexArray2D[] = [];
     _color: Color = Color.FromRGBA(1, 0, 0, 1);
     _selected: boolean = false;
+    _radius: number = 0.01;
 
     set zValue(value) {
         this._zValue = value;
@@ -44,9 +45,9 @@ export class JointModel extends ANodeModel2D{
             verts??Polygon2D.CreateForRendering(true, true, false)
         )
 
-        let pnts = Polygon2D.CircleVArray(0.15, 15);
+        let pnts = Polygon2D.CircleVArray(this._radius, 15);
         for (let i = 0; i < pnts.nVerts; i++)
-            this.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
+            this.verts.addVertex(pnts.vertexAt(i), this._color);
 
         // this.setPos(this._position);
     }
@@ -68,7 +69,21 @@ export class JointModel extends ANodeModel2D{
     setUniformColor(color:Color){
         this.verts.FillColor(color);
     }
+    
+    setJointRadius(radius: number){
+        this._radius = radius;
+    }
 
+    reradius(){
+        let pnts = Polygon2D.CircleVArray(this._radius, 15);
+        let newVerts = new VertexArray2D();
+        newVerts.initColorAttribute();
+        for (let i = 0; i < pnts.nVerts; i++)
+            newVerts.addVertex(pnts.vertexAt(i), this._color);
+        this.setVerts(newVerts);
+        this.setPos(this._position);
+        this.signalGeometryUpdate();
+    }
     /**
      * Returns the transform from object coordinates (the coordinate system where this.verts is
      * defined) to world coordinates
