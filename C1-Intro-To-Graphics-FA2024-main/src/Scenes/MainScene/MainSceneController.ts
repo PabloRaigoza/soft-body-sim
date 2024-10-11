@@ -174,94 +174,61 @@ export class MainSceneController extends App2DSceneController{
                 onKeyDown: (event:AInteractionEvent, interaction:AKeyboardInteraction)=>{
                 },
                 onKeyUp:(event:AInteractionEvent, interaction:AKeyboardInteraction)=>{
-                    if(event.key==='t'){
-                        this.model.addNewSpline()
-                    }
-
-                    if(event.key==='s'){
-                    }
-                    if(event.key==='S'){
-                    }
-                    if(event.key==='ArrowRight'){
-                    }
-                    if(event.key==='ArrowLeft'){
-                    }
-                    if(event.key==='ArrowUp'){
-                    }
-                    if(event.key==='ArrowDown'){
+                    // if(event.key==='s'){
+                    // }
+                    // if(event.key==='S'){
+                    // }
+                    // if(event.key==='ArrowRight'){
+                    // }
+                    // if(event.key==='ArrowLeft'){
+                    // }
+                    // if(event.key==='ArrowUp'){
+                    // }
+                    // if(event.key==='ArrowDown'){
+                    // }
+                    // // if (event.key === 'i') {
+                    // //     let ndcCursor = event.ndcCursor;
+                    // //     if (ndcCursor) {
+                    // //         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                    // //         console.log(cursorPosition);
+                    // //         this.springModel.impulse(cursorPosition.clone());
+                    // //     }
+                    // // }
+                    if (event.key === 'w' || event.key === 'ArrowUp') this.springModel.keyImpulse(V2(0, 1));
+                    if (event.key === 's' || event.key === 'ArrowDown') this.springModel.keyImpulse(V2(0, -1));
+                    if (event.key === 'a' || event.key === 'ArrowLeft') this.springModel.keyImpulse(V2(-1, 0));
+                    if (event.key === 'd' || event.key === 'ArrowRight') this.springModel.keyImpulse(V2(1, 0));
+                },
+                onClick:(event:AInteractionEvent)=>{
+                    let ndcCursor = event.ndcCursor;
+                    if (ndcCursor) {
+                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
+                        this.springModel.cursorImpulse(cursorPosition.clone());
                     }
                 },
                 onDragStart:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                    // let ndcCursor = event.ndcCursor;
-                    // if(ndcCursor) {
-                    //     let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                    //     interaction.cursorStartPosition = cursorPosition;
-                    //     if(self.splineModel.nControlPoints<1){
-                    //         self.splineModel.verts.addVertices(
-                    //             [
-                    //                 cursorPosition,
-                    //                 cursorPosition,
-                    //             ],
-                    //             Color.White()
-                    //         )
-                    //     }else {
-                    //         self.splineModel.verts.addVertices(
-                    //             [
-                    //                 cursorPosition,
-                    //                 cursorPosition,
-                    //                 cursorPosition,
-                    //             ],
-                    //             Color.White()
-                    //         )
-                    //     }
-                    //     // this.newVertsColor = Color.RandomRGB();
-                    //     this.splineModel.signalGeometryUpdate();
-                    // }
                     let ndcCursor = event.ndcCursor;
                     if (ndcCursor) {
                         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
                         this.springModel.dragStart(cursorPosition);
                         this.springModel.signalGeometryUpdate();
                     }
-                    console.log('key down');
                 },
                 onDragMove:(event:AInteractionEvent, interaction:ADragInteraction)=>{
-                    // let ndcCursor = event.ndcCursor;
-                    // if(ndcCursor) {
-                    //     let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
-                    //     let startPosition = interaction.cursorStartPosition;
-                    //     if (this.splineModel.nControlPoints > 3) {
-                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 2, startPosition);
-                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
-                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 3, startPosition.minus(cursorPosition.minus(startPosition)));
-                    //     }else{
-                    //         this.splineModel.verts.position.setAt(this.splineModel.nControlPoints - 1, cursorPosition);
-                    //     }
-                    //     this.splineModel.signalGeometryUpdate();
-                    // }
                     let ndcCursor = event.ndcCursor;
                     if (ndcCursor) {
                         let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
                         this.springModel.dragging(cursorPosition);
                         this.springModel.signalGeometryUpdate();
                     }
-                    console.log('key drag');
                 },
                 onDragEnd:(event:AInteractionEvent, interaction:ADragInteraction)=>{
                     let ndcCursor = event.ndcCursor;
                     if (ndcCursor) {
-                        let cursorPosition = this.model.worldPointFromNDCCursor(ndcCursor)
                         this.springModel.dragEnd();
                         this.springModel.signalGeometryUpdate();
                     }
-                    console.log('key drag');
                 },
-                // onClick:(event:AInteractionEvent)=>{},
-                // afterActivate:(...args:any[])=>{},
-                // afterDeactivate:(...args:any[])=>{},
-                // beforeActivate:(...args:any[])=>{},
-                // beforeDeactivate:(...args:any[])=>{},
-                //dispose:()=>{},
             }
         )
         this.defineInteractionMode("MainInteractionMode", this.mainInteractionMode);

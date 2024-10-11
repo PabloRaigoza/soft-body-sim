@@ -48,7 +48,7 @@ export class JointModel extends ANodeModel2D{
         for (let i = 0; i < pnts.nVerts; i++)
             this.verts.addVertex(pnts.vertexAt(i), Color.FromRGBA(1,0,0,1));
 
-        // this.setPos(new Vec2(0, 4));
+        // this.setPos(this._position);
     }
 
     getTransform3D() {
@@ -206,16 +206,19 @@ export class JointModel extends ANodeModel2D{
                 let u = normal.times(v.dot(normal) / normal.dot(normal));
                 let w = v.minus(u);
                 this._velocity = w.minus(u);
+                return;
             }
         }
     }
 
 
+    prevVelocity: Vec2 = new Vec2(0, 0);
     timeUpdate(t: number, ...args: any[]): void {
         if (this._selected) return;
         let joints = args[0];
+        this._mass = 2;
 
-        const G = 0.005;
+        const G = 0.01;
         let F = this._force;
         let dt = t - this._lt;  // Delta time for the current frame
         dt = 1;
@@ -223,29 +226,37 @@ export class JointModel extends ANodeModel2D{
 
         // if(this.environmentCollision()) F.y = 0;
         this.environmentCollision();
-        this.jointsCollision(joints);
+        // this.jointsCollision(joints);
 
-        // Check for collision with the ground
-        // if (this._position.y <= -5) {
-        //     this._position.y = -5;  // Ensure position doesn't go below the ground
-            // this._velocity.y = Math.abs(this._velocity.y);  // Flip velocity in y-direction to simulate bounce
-        //     // F.y += G;
+        // set max force
+        // let maxForce = 0.1;
+        // if (F.dot(F) > maxForce * maxForce) {
+        //     F.normalize();
+        //     F = F.times(maxForce);
         // }
-        
-        // Update position on screen or environment
         this._velocity = this._velocity.plus(F.times(dt / this._mass));  // Update velocity using force
-        // set max velocity
-        // let maxVel = Infinity;
-        let maxVel = 0.05;
-        if (this._velocity.dot(this._velocity) > maxVel * maxVel) {
-            this._velocity.normalize();
-            this._velocity = this._velocity.times(maxVel);
-        }
+        
+        // let maxVel = 0.5;
+        // let maxVelDiff = 2;
+        // if (this.prevVelocity.dot(this.prevVelocity) > 0) {
+        //     let prevLen = Math.sqrt(this.prevVelocity.dot(this.prevVelocity));
+        //     let currLen = Math.sqrt(this._velocity.dot(this._velocity));
+        //     if (Math.abs(prevLen - currLen) / prevLen > maxVelDiff) {
+        //         this._velocity.normalize();
+        //         this._velocity = this._velocity.times(prevLen);
+        //         // console.log('maxVelDiff');
+        //     }
+        // }
+
+        // if (this._velocity.dot(this._velocity) > maxVel * maxVel) {
+        //     this._velocity.normalize();
+        //     this._velocity = this._velocity.times(maxVel);
+        // }
         this._position = this._position.plus(this._velocity.times(dt));  // Update position
         this.setPos(this._position);
 
         this._force = new Vec2(0, 0);
+        this.prevVelocity = this._velocity;
         this._velocity = this._velocity.times(0.9);  // Apply damping
-
     }
 }

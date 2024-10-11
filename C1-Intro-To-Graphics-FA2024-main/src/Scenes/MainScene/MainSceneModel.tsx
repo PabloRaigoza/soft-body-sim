@@ -64,7 +64,6 @@ export class MainSceneModel extends App2DSceneModel{
         this.addSpline(new SplineModel());
     }
                             
-    //joints:JointModel[] = [];
     springs:SpringModel[] = [];
     polygonMaterial!:AMaterial;
     initScene(){
@@ -72,11 +71,9 @@ export class MainSceneModel extends App2DSceneModel{
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
         this.obstacles_basic();
-        // this.subscribe(appState.addStateValueListener("ColorValue1", (newValue)=>{
-        //     for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
-        //     for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
-        // }), "ColorSubscription")
-        this.basicMesh();
+        // this.obstacles_dynamic();
+        // this.basicMesh();
+        this.complexMesh();
     }
 
 
@@ -148,7 +145,7 @@ export class MainSceneModel extends App2DSceneModel{
         spring.setMaterial(this.polygonMaterial);
 
         let top_left = new Vec2(-4, 8);
-        let gSz = 0.6;
+        let gSz = 1;
         let points: Vec2[] = [];
         
         for (let i = 0; i <= 23; i++) points.push(top_left.add(new Vec2(i % 4 * gSz, Math.floor(i / 4) * gSz)));
