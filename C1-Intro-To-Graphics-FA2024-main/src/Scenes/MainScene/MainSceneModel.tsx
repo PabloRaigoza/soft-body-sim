@@ -401,10 +401,10 @@ export class MainSceneModel extends App2DSceneModel{
 
         let bottomPeg = new Polygon2DModel();
         bottomPeg.setMaterial(this.polygonMaterial);
-        bottomPeg.verts.addVertex(new Vec2(-1, -8), Color.FromString("#000000"));
-        bottomPeg.verts.addVertex(new Vec2(1, -8), Color.FromString("#000000"));
-        bottomPeg.verts.addVertex(new Vec2(1, -20), Color.FromString("#000000"));
-        bottomPeg.verts.addVertex(new Vec2(-1, -20), Color.FromString("#000000"));
+        bottomPeg.verts.addVertex(new Vec2(-1, -8), Color.FromString("#aaaaaa"));
+        bottomPeg.verts.addVertex(new Vec2(1, -8), Color.FromString("#aaaaaa"));
+        bottomPeg.verts.addVertex(new Vec2(1, -20), Color.FromString("#aaaaaa"));
+        bottomPeg.verts.addVertex(new Vec2(-1, -20), Color.FromString("#aaaaaa"));
         this.addChild(bottomPeg);
         this.sceneShapes.push(bottomPeg);
     }
