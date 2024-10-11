@@ -10,13 +10,22 @@ import { Polygon2DModel } from "anigraph/starter/nodes/polygon2D";
 
 let nErrors = 0;
 
+enum AppStateKeys{
+    joint_mass="JointMass",
+    joint_damping="JointDamping",
+    joint_stiffness="JointStiffness",
+    joint_color="JointColor",
+}
+
 /**
  * This is your Scene Model class. The scene model is the main data model for your application. It is the root for a
  * hierarchy of models that make up your scene/
  */
 export class MainSceneModel extends App2DSceneModel{
-
+    static AppStateKeys=AppStateKeys;
     _splines:SplineModel[] = [];
+    color:Color = Color.FromString("#aaaaaa");
+
     get splines():SplineModel[]{
         return this._splines;
     }
@@ -31,7 +40,7 @@ export class MainSceneModel extends App2DSceneModel{
      */
     initAppState(appState:AppState){
         //appState.addSliderIfMissing("SliderValue1", 0, 0, 1, 0.001);
-        appState.addColorControl("ParticleColor", Color.FromString("#d20909"));
+        appState.addColorControl("JointColor", Color.FromString("#aaaaaa"));
     }
 
     /**
@@ -53,20 +62,24 @@ export class MainSceneModel extends App2DSceneModel{
 
     addNewSpline(){
         this.addSpline(new SplineModel());
+        this.springs[0].joints
     }
                             
-    joints:JointModel[] = [];
+    //joints:JointModel[] = [];
     springs:SpringModel[] = [];
     polygonMaterial!:AMaterial;
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
-        // this.obstacles_dynamic();
         this.obstacles_basic();
-        // this.complexMesh();
+        this.subscribe(appState.addStateValueListener("ColorValue1", (newValue)=>{
+            for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
+            for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
+        }), "ColorSubscription")
         this.basicMesh();
     }
+
 
     basicTrussMesh() {
         let spring = new SpringModel();
@@ -96,6 +109,7 @@ export class MainSceneModel extends App2DSceneModel{
         for (let i = 0; i < points.length; i++) {
             spring.addJoint(points[i], this.polygonMaterial, this);
         }
+        
         // spring.addJoint(p7, this.polygonMaterial, this);
         // spring.addJoint(p8, this.polygonMaterial, this);
 
@@ -125,7 +139,7 @@ export class MainSceneModel extends App2DSceneModel{
         // spring.addEdge(0,7,Math.sqrt(p0.add(p7.times(-1)).dot(p0.add(p7.times(-1)))));
         // spring.addEdge(2,8,Math.sqrt(p2.add(p8.times(-1)).dot(p2.add(p8.times(-1)))));
 
-        spring.setPolys([this.myRect2.verts, this.myRect.verts, this.myRect3.verts]);
+        spring.setPolys([this.myRect2.verts, this.myRect.verts, this.myRect3.verts, this.myRect4.verts, this.myTriangle.verts]);
         
         this.addChild(spring);
         this.springs.push(spring);
@@ -325,6 +339,9 @@ export class MainSceneModel extends App2DSceneModel{
             // ])
             for (let spline of this.splines) spline.timeUpdate(t);
             for (let spring of this.springs) spring.timeUpdate(t);
+            //for (let joint of this.joints) joint.setUniformColor(this.color);
+            //this.myRect2.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(Math.PI/4)));
+            //this.myRect3.setTransform(Mat3.Translation2D(new Vec2(-4,2)).times(Mat3.Rotation(t)).times(Mat3.Rotation(-Math.PI/4)));
         }
 
         catch(e) {

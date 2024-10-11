@@ -16,6 +16,7 @@ export class JointModel extends ANodeModel2D{
     _lt: number = 0;
     _force: Vec2 = new Vec2(0, 0);
     _polys: VertexArray2D[] = [];
+    _color: Color = Color.FromRGBA(1, 0, 0, 1);
     _selected: boolean = false;
 
     set zValue(value) {
@@ -245,5 +246,6 @@ export class JointModel extends ANodeModel2D{
 
         this._force = new Vec2(0, 0);
         this._velocity = this._velocity.times(0.9);  // Apply damping
+
     }
 }
