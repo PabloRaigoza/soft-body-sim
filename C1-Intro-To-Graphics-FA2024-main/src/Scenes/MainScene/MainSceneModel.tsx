@@ -70,7 +70,7 @@ export class MainSceneModel extends App2DSceneModel{
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
 
-        this.createScenesAndMeshes("truss", "dynamic");
+        this.createScenesAndMeshes("circular", "basic");
 
         this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
             for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
@@ -115,6 +115,7 @@ export class MainSceneModel extends App2DSceneModel{
         if (meshOption == "basic") this.basicMesh();
         else if (meshOption == "complex") this.complexMesh();
         else if (meshOption == "truss") this.basicTrussMesh();
+        else if (meshOption == "circular") this.circularMesh();
     }
 
 
@@ -298,12 +299,12 @@ export class MainSceneModel extends App2DSceneModel{
             spring.addEdge(i, numInnerPoints + correspondingOuterIndex1, calculateDistance(innerPoints[i], outerPoints[correspondingOuterIndex1]));
             spring.addEdge(i, numInnerPoints + correspondingOuterIndex2, calculateDistance(innerPoints[i], outerPoints[correspondingOuterIndex2]));
         }
-        spring.setPolys([
-            this.myRect.verts.GetTransformedBy(this.myRect.transform as Mat3),
-            this.myRect2.verts.GetTransformedBy(this.myRect2.transform as Mat3),
-            this.myRect3.verts.GetTransformedBy(this.myRect3.transform as Mat3),
-            this.myTriangle.verts.GetTransformedBy(this.myTriangle.transform as Mat3)
-        ]);
+        
+        let polys: VertexArray2D[] = [];
+        for (let scenePoly of this.sceneShapes) {
+            polys.push(scenePoly.verts.GetTransformedBy(scenePoly.transform as Mat3));
+        }
+        spring.setPolys(polys);
     
         this.addChild(spring);
         this.springs.push(spring);
