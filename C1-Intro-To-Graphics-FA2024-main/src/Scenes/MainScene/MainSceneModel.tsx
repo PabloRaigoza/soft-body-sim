@@ -62,7 +62,6 @@ export class MainSceneModel extends App2DSceneModel{
 
     addNewSpline(){
         this.addSpline(new SplineModel());
-        this.springs[0].joints
     }
                             
     //joints:JointModel[] = [];
@@ -73,10 +72,10 @@ export class MainSceneModel extends App2DSceneModel{
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
         this.obstacles_basic();
-        this.subscribe(appState.addStateValueListener("ColorValue1", (newValue)=>{
-            for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
-            for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
-        }), "ColorSubscription")
+        // this.subscribe(appState.addStateValueListener("ColorValue1", (newValue)=>{
+        //     for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
+        //     for (let joint of this.springs[0].joints) joint.signalGeometryUpdate(); // signal that the geometry of our polygon has changed so that the view will update
+        // }), "ColorSubscription")
         this.basicMesh();
     }
 
