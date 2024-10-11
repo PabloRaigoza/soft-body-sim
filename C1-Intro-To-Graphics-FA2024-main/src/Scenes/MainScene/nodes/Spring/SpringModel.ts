@@ -97,13 +97,38 @@ export class SpringModel extends ANodeModel2D {
     dragEnd() {
         if (this.selected_joint != -1) {
             this.joints[this.selected_joint].setSelected(false);
-            // this.joints[this.selected_joint]._velocity = new Vec2(0, 0);
             this.selected_joint = -1;
             for (let joint of this.joints) joint._velocity = new Vec2(0, 0);
         }
     }
 
+    cursorImpulses: Vec2[] = [];
+    cursorImpulse(cursor: Vec2) {
+        this.cursorImpulses.push(cursor.clone());
+    }
+
+    keyImpulses: Vec2[] = [];
+    keyImpulse(forceDir: Vec2) { this.keyImpulses.push(forceDir); }
+
     timeUpdate(t: number, ...args: any[]): void {
+        for (let cursor of this.cursorImpulses) {
+            for (let joint of this.joints) {
+                let normal = joint.position.minus(cursor);
+                normal.normalize();
+                joint.applyForce(normal.times(0.1));
+            }
+        }
+        this.cursorImpulses = [];
+        
+        for (let keyImpulse of this.keyImpulses) {
+            for (let joint of this.joints) {
+                let normal = keyImpulse;
+                normal.normalize();
+                joint.applyForce(normal.times(0.1));
+            }
+        }
+        this.keyImpulses = [];
+        
         for (let edge of this.edges) {
             let i = edge.x;
             let j = edge.y;
