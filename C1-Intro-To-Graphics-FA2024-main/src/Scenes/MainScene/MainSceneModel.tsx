@@ -36,9 +36,9 @@ export class MainSceneModel extends App2DSceneModel{
         appState.addSliderIfMissing("SpringStiffness", 0.3, 0.01, 0.5, 0.01);
         appState.addSliderIfMissing("JointRadius", 0.1, 0, 0.3, 0.01);
         appState.addColorControl("SpringColor", Color.FromRGBA([1, 1, 1, 1]));
-        appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.01, 0.0005);
-        appState.addSliderIfMissing("Dt", 1, 0, 1, 0.1);
-        appState.addSliderIfMissing("ImpulseScale", 0.1, -0.25, 0.25, 0.01);
+        appState.addSliderIfMissing("Gravity", 0.002, -0.005, 0.005, 0.0001);
+        appState.addSliderIfMissing("t", 1, 0.1, 1, 0.1);
+        appState.addSliderIfMissing("ImpulseScale", 0.1, -0.4, 0.4, 0.01);
     }
 
     /**
@@ -64,13 +64,14 @@ export class MainSceneModel extends App2DSceneModel{
                             
     springs:SpringModel[] = [];
     sceneShapes: Polygon2DModel[] = [];
+    isDynamicScene:boolean = true;
     polygonMaterial!:AMaterial;
     initScene(){
         let appState = GetAppState();
         this.addNewSpline();
         this.polygonMaterial = appState.CreateMaterial(DefaultMaterials.RGBA_SHADER);
 
-        this.createScenesAndMeshes("circular", "basic");
+        this.createScenesAndMeshes("complex", "dynamic");
 
         this.subscribe(appState.addStateValueListener("JointColor", (newValue)=>{
             for (let joint of this.springs[0].joints) joint.setUniformColor(newValue);
@@ -90,7 +91,7 @@ export class MainSceneModel extends App2DSceneModel{
             for (let joint of this.springs[0].joints) joint.setGravity(newValue);
             for (let joint of this.springs[0].joints) joint.signalGeometryUpdate();
         }), "GravitySubscription")
-        this.subscribe(appState.addStateValueListener("Dt", (newValue)=>{
+        this.subscribe(appState.addStateValueListener("t", (newValue)=>{
             for (let joint of this.springs[0].joints) joint.setDt(newValue);
             for (let joint of this.springs[0].joints) joint.signalGeometryUpdate();
         }), "DtSubscription")
@@ -371,7 +372,41 @@ export class MainSceneModel extends App2DSceneModel{
     }
 
     obstacles_dynamic() {
-        
+        let leftWall = new Polygon2DModel();
+        leftWall.setMaterial(this.polygonMaterial);
+        leftWall.verts.addVertex(new Vec2(-15, 8), Color.FromString("#aaaaaa"));
+        leftWall.verts.addVertex(new Vec2(-7, 8), Color.FromString("#aaaaaa"));
+        leftWall.verts.addVertex(new Vec2(-7, -8), Color.FromString("#aaaaaa"));
+        leftWall.verts.addVertex(new Vec2(-15, -8), Color.FromString("#aaaaaa"));
+        this.addChild(leftWall);
+        this.sceneShapes.push(leftWall);
+
+        let bottomWall = new Polygon2DModel();
+        bottomWall.setMaterial(this.polygonMaterial);
+        bottomWall.verts.addVertex(new Vec2(-10, -8), Color.FromString("#aaaaaa"));
+        bottomWall.verts.addVertex(new Vec2(10, -8), Color.FromString("#aaaaaa"));
+        bottomWall.verts.addVertex(new Vec2(10, -20), Color.FromString("#aaaaaa"));
+        bottomWall.verts.addVertex(new Vec2(-10, -20), Color.FromString("#aaaaaa"));
+        this.addChild(bottomWall);
+        this.sceneShapes.push(bottomWall);
+
+        let rightWall = new Polygon2DModel();
+        rightWall.setMaterial(this.polygonMaterial);
+        rightWall.verts.addVertex(new Vec2(7, 8), Color.FromString("#aaaaaa"));
+        rightWall.verts.addVertex(new Vec2(15, 8), Color.FromString("#aaaaaa"));
+        rightWall.verts.addVertex(new Vec2(15, -8), Color.FromString("#aaaaaa"));
+        rightWall.verts.addVertex(new Vec2(7, -8), Color.FromString("#aaaaaa"));
+        this.addChild(rightWall);
+        this.sceneShapes.push(rightWall);
+
+        let bottomPeg = new Polygon2DModel();
+        bottomPeg.setMaterial(this.polygonMaterial);
+        bottomPeg.verts.addVertex(new Vec2(-1, -8), Color.FromString("#aaaaaa"));
+        bottomPeg.verts.addVertex(new Vec2(1, -8), Color.FromString("#aaaaaa"));
+        bottomPeg.verts.addVertex(new Vec2(1, -20), Color.FromString("#aaaaaa"));
+        bottomPeg.verts.addVertex(new Vec2(-1, -20), Color.FromString("#aaaaaa"));
+        this.addChild(bottomPeg);
+        this.sceneShapes.push(bottomPeg);
     }
 
 
@@ -379,6 +414,21 @@ export class MainSceneModel extends App2DSceneModel{
 
     timeUpdate(t: number) {
         try {
+            if (this.isDynamicScene) {
+                let leftWall = this.sceneShapes[0];
+                let bottomWall = this.sceneShapes[1];
+                let rightWall = this.sceneShapes[2];
+                let bottomWallPeg = this.sceneShapes[3];
+
+                leftWall.setTransform(Mat3.Translation2D(new Vec2(3 * Math.sin(t) + 2, 0)));
+                bottomWall.setTransform(Mat3.Translation2D(new Vec2(0, 3 + 3 * Math.sin(t + Math.PI / 2))));
+                rightWall.setTransform(Mat3.Translation2D(new Vec2(-2 + -3 * Math.sin(t + Math.PI * 3 / 2), 0)));
+                bottomWallPeg.setTransform(Mat3.Translation2D(new Vec2(0, 10 + 2*Math.sin(2*t + Math.PI / 8))));
+
+                let newPolys: VertexArray2D[] = [];
+                for (let scenePoly of this.sceneShapes) newPolys.push(scenePoly.verts.GetTransformedBy(scenePoly.transform as Mat3));
+                for (let spring of this.springs) spring.setPolys(newPolys);
+            }
             for (let spring of this.springs) spring.timeUpdate(t);
         }
         catch(e) {
