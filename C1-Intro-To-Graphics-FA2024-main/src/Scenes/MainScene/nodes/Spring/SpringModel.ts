@@ -89,7 +89,9 @@ export class SpringModel extends ANodeModel2D {
         if (closestDistance < 0.5) {
             closestJoint.setSelected(true);
             this.selected_joint = this.joints.indexOf(closestJoint);
+            return true;
         }
+        return false;
     }
 
     dragging(point : Vec2) {
@@ -119,7 +121,7 @@ export class SpringModel extends ANodeModel2D {
             for (let joint of this.joints) {
                 let normal = joint.position.minus(cursor);
                 normal.normalize();
-                joint.applyForce(normal.times(this._impulse));
+                joint.applyForce(normal.times(this._impulse/10));
             }
         }
         this.cursorImpulses = [];
